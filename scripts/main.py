@@ -6,20 +6,22 @@ Usage:
     python main.py --model qwen-7b --exp all
     python main.py --model llama-3b --exp core n-sweep tokenization
 """
-import argparse
 import sys
-import json
 from pathlib import Path
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from utils import Config, load_model_and_tokenizer, load_prompts, set_seed
+import argparse
+import json
+from config.utils import Config, load_model_and_tokenizer, load_prompts, set_seed, load_config_from_json
+from experiments import run_phase, n_sweep_analysis
+from attention_analysis import get_attentions, find_word_list_span
+from hidden_states import get_hidden_states
+from probing import run_loo_probe
+from logit_lens import logit_lens
 
-MODEL_REGISTRY = {
-    "llama-1b": "meta-llama/Llama-3.2-1B-Instruct",
-    "llama-3b": "meta-llama/Llama-3.2-3B-Instruct",
-    "qwen-1.5b": "Qwen/Qwen2.5-1.5B-Instruct",
-    "qwen-3b": "Qwen/Qwen2.5-3B-Instruct",
-    "qwen-7b": "Qwen/Qwen2.5-7B-Instruct",
-}
+config_data = load_config_from_json()
+llm_configs = config_data.get("llm_config", {})
+MODEL_REGISTRY = {k: v.get("model_id", "") for k, v in llm_configs.items()}
 
 AVAILABLE_EXPERIMENTS = [
     "core",
@@ -37,8 +39,6 @@ def run_core_experiment(model, tokenizer, pipe, config, prompts):
     print("\n" + "="*70)
     print("CORE EXPERIMENT: 3-PHASE BASELINE")
     print("="*70)
-    
-    from experiments_code import run_phase
     
     all_results = {}
     summaries = {}
@@ -80,8 +80,6 @@ def run_n_sweep(model, tokenizer, pipe, config, prompts):
     print("\n" + "="*70)
     print("N-SWEEP ANALYSIS: Behavioral characterization")
     print("="*70)
-    
-    from experiments_code import n_sweep_analysis
     
     results_p1 = n_sweep_analysis(
         "phase1_baseline", prompts, pipe, config, model, tokenizer,
@@ -134,8 +132,6 @@ def run_attention_analysis(model, tokenizer, pipe, config, prompts):
     print("Analyzing attention sink hypothesis...")
     print("(Extracting attention patterns from all layers)")
     
-    from experiments_code import get_attentions, find_word_list_span
-    
     results = {}
     for phase_key, entry in prompts.items():
         text = entry["text"]
@@ -152,8 +148,6 @@ def run_linear_probe(model, tokenizer, pipe, config, prompts):
     
     print("Training linear probes on hidden states...")
     
-    from experiments_code import get_hidden_states, run_loo_probe
-    
     results = {}
     for phase_key in ["phase1_baseline", "phase3_control"]:
         print(f"  Probing {phase_key}...")
@@ -168,8 +162,6 @@ def run_logit_lens(model, tokenizer, pipe, config, prompts):
     print("="*70)
     
     print("Identifying lock-in layer via logit lens...")
-    
-    from experiments_code import logit_lens_full
     
     results = {}
     for phase_key in ["phase1_baseline", "phase3_control"]:
@@ -257,7 +249,7 @@ Examples:
     
     config = Config(model_name=model_name, n_runs=args.n_runs)
     model, tokenizer, pipe = load_model_and_tokenizer(model_name)
-    prompts = load_prompts("prompts.json")
+    prompts = load_prompts()
     
     print("Prompts loaded:")
     for k in prompts.keys():

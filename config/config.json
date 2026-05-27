@@ -1,0 +1,35 @@
+{
+  "llm_config": {
+    "llama-1b": {
+      "model_id": "meta-llama/Llama-3.2-1B-Instruct",
+      "dtype": "bfloat16",
+      "device_map": "auto"
+    },
+    "llama-3b": {
+      "model_id": "meta-llama/Llama-3.2-3B-Instruct",
+      "dtype": "bfloat16",
+      "device_map": "auto"
+    },
+    "qwen-1.5b": {
+      "model_id": "Qwen/Qwen2.5-1.5B-Instruct",
+      "dtype": "bfloat16",
+      "device_map": "auto"
+    },
+    "qwen-3b": {
+      "model_id": "Qwen/Qwen2.5-3B-Instruct",
+      "dtype": "bfloat16",
+      "device_map": "auto"
+    },
+    "qwen-7b": {
+      "model_id": "Qwen/Qwen2.5-7B-Instruct",
+      "dtype": "bfloat16",
+      "device_map": "auto"
+    }
+  },
+  "experiment_config": {
+    "n_runs": 10,
+    "max_new_tokens": 16,
+    "temperature": 0.0,
+    "do_sample": false
+  }
+}

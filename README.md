@@ -1,20 +1,27 @@
 # The Odometer Hypothesis in LLMs
 
+Code for this paper - [Repeated-Token Counting Reveals a Dissociation Between Representations and Outputs](https://arxiv.org/abs/2605.09239)
+
 ## Project Structure
 
 ```
 counting-failure/
-├── notebooks/
-│   ├── llama-1B.ipynb
-│   ├── llama-3B.ipynb
-│   ├── qwen-1.5B.ipynb
-│   ├── qwen-3B.ipynb
-│   └── qwen-7B.ipynb
-└── scripts/
-    ├── main.py
-    ├── utils.py
-    ├── experiments_code.py
-    └── prompts.json
+├── config/
+│   ├── __init__.py
+│   ├── config.json
+│   ├── prompts.json
+│   └── utils.py
+├── scripts/
+│   ├── main.py
+│   ├── experiments.py
+│   ├── attention_analysis.py
+│   ├── hidden_states.py
+│   ├── probing.py
+│   ├── logit_lens.py
+│   ├── intervention.py
+│   ├── hooks.py
+│   └── prompts_utils.py
+└── README.md
 ```
 
 ## Experiments
@@ -33,13 +40,13 @@ counting-failure/
 ```bash
 pip install transformers torch accelerate matplotlib scikit-learn
 huggingface-cli login
-cd scripts
 ```
 
 ## Run
 
 ```bash
-python main.py --model llama-1b --exp core
-python main.py --model qwen-7b --exp core tokenization n-sweep --n-runs 5
-python main.py --model llama-3b --exp all --save-results
+python3 scripts/main.py --model llama-1b --exp core
+python3 scripts/main.py --model qwen-7b --exp core tokenization n-sweep --n-runs 5
+python3 scripts/main.py --model llama-3b --exp all --save-results
 ```
+
