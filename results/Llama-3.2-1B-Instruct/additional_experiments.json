@@ -1,0 +1,83 @@
+{
+  "language_robustness": {
+    "english": {
+      "predicted": 8,
+      "correct": false,
+      "stability": "STABLE"
+    },
+    "chinese": {
+      "predicted": 8,
+      "correct": false,
+      "stability": "STABLE"
+    },
+    "french": {
+      "predicted": null,
+      "correct": false,
+      "stability": "SHIFTED to None"
+    }
+  },
+  "repeated_symbols": {
+    "apple": {
+      "predicted": 8,
+      "correct": false,
+      "prior_fires": "YES"
+    },
+    "1": {
+      "predicted": 10,
+      "correct": true,
+      "prior_fires": "no \u2192 10"
+    },
+    "0": {
+      "predicted": 10,
+      "correct": true,
+      "prior_fires": "no \u2192 10"
+    },
+    "7": {
+      "predicted": 9,
+      "correct": false,
+      "prior_fires": "no \u2192 9"
+    },
+    "cat": {
+      "predicted": 8,
+      "correct": false,
+      "prior_fires": "YES"
+    },
+    "the": {
+      "predicted": 8,
+      "correct": false,
+      "prior_fires": "YES"
+    },
+    "a": {
+      "predicted": 8,
+      "correct": false,
+      "prior_fires": "YES"
+    },
+    "X": {
+      "predicted": 8,
+      "correct": false,
+      "prior_fires": "YES"
+    }
+  },
+  "chain_of_thought": {
+    "direct": {
+      "final_number": 8,
+      "correct": false,
+      "raw": "8"
+    },
+    "cot_stepbystep": {
+      "final_number": 11,
+      "correct": false,
+      "raw": "To count the number of times \"apple\" appears in the list, let's break it down step by step:\n\n1. The list contains 11 elements: \"apple\" appears 11 times.\n2. Since \"apple\" appears 11 times, we can conclude that the count is 11.\n\nThe final count is: 11"
+    },
+    "cot_enumerate": {
+      "final_number": 9,
+      "correct": false,
+      "raw": "Here's the list with each item numbered:\n\n1. apple\n2. apple\n3. apple\n4. apple\n5. apple\n6. apple\n7. apple\n8. apple\n9. apple\n\nThe word \"apple\" appears 9 times in the given list."
+    },
+    "cot_tally": {
+      "final_number": 9,
+      "correct": false,
+      "raw": "1. apple\n2. apple\n3. apple\n4. apple\n5. apple\n6. apple\n7. apple\n8. apple\n9. apple\n\nThe word \"apple\" appears 9 times in the given list."
+    }
+  }
+}

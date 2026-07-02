@@ -1,0 +1,344 @@
+{
+  "source_phase": "phase3_control",
+  "target_phase": "phase1_baseline",
+  "correct_answer": 10,
+  "unpatched_output": "14",
+  "sweep": [
+    {
+      "layer": 1,
+      "top_digit": "14",
+      "flipped_to_correct": false,
+      "top5_tokens": [
+        "14",
+        "10",
+        "13",
+        "12",
+        "11"
+      ]
+    },
+    {
+      "layer": 2,
+      "top_digit": "14",
+      "flipped_to_correct": false,
+      "top5_tokens": [
+        "14",
+        "10",
+        "13",
+        "12",
+        "11"
+      ]
+    },
+    {
+      "layer": 3,
+      "top_digit": "14",
+      "flipped_to_correct": false,
+      "top5_tokens": [
+        "14",
+        "10",
+        "13",
+        "12",
+        "11"
+      ]
+    },
+    {
+      "layer": 4,
+      "top_digit": "14",
+      "flipped_to_correct": false,
+      "top5_tokens": [
+        "14",
+        "10",
+        "13",
+        "12",
+        "11"
+      ]
+    },
+    {
+      "layer": 5,
+      "top_digit": "14",
+      "flipped_to_correct": false,
+      "top5_tokens": [
+        "14",
+        "10",
+        "13",
+        "12",
+        "11"
+      ]
+    },
+    {
+      "layer": 6,
+      "top_digit": "14",
+      "flipped_to_correct": false,
+      "top5_tokens": [
+        "14",
+        "10",
+        "13",
+        "12",
+        "11"
+      ]
+    },
+    {
+      "layer": 7,
+      "top_digit": "14",
+      "flipped_to_correct": false,
+      "top5_tokens": [
+        "14",
+        "10",
+        "13",
+        "12",
+        "11"
+      ]
+    },
+    {
+      "layer": 8,
+      "top_digit": "14",
+      "flipped_to_correct": false,
+      "top5_tokens": [
+        "14",
+        "10",
+        "13",
+        "12",
+        "11"
+      ]
+    },
+    {
+      "layer": 9,
+      "top_digit": "14",
+      "flipped_to_correct": false,
+      "top5_tokens": [
+        "14",
+        "10",
+        "13",
+        "12",
+        "11"
+      ]
+    },
+    {
+      "layer": 10,
+      "top_digit": "14",
+      "flipped_to_correct": false,
+      "top5_tokens": [
+        "14",
+        "13",
+        "10",
+        "12",
+        "11"
+      ]
+    },
+    {
+      "layer": 11,
+      "top_digit": "14",
+      "flipped_to_correct": false,
+      "top5_tokens": [
+        "14",
+        "13",
+        "10",
+        "12",
+        "11"
+      ]
+    },
+    {
+      "layer": 12,
+      "top_digit": "14",
+      "flipped_to_correct": false,
+      "top5_tokens": [
+        "14",
+        "10",
+        "13",
+        "11",
+        "12"
+      ]
+    },
+    {
+      "layer": 13,
+      "top_digit": "14",
+      "flipped_to_correct": false,
+      "top5_tokens": [
+        "14",
+        "11",
+        "13",
+        "12",
+        "10"
+      ]
+    },
+    {
+      "layer": 14,
+      "top_digit": "11",
+      "flipped_to_correct": false,
+      "top5_tokens": [
+        "11",
+        "10",
+        "9",
+        "12",
+        "8"
+      ]
+    },
+    {
+      "layer": 15,
+      "top_digit": "11",
+      "flipped_to_correct": false,
+      "top5_tokens": [
+        "11",
+        "10",
+        "12",
+        "9",
+        "13"
+      ]
+    },
+    {
+      "layer": 16,
+      "top_digit": "11",
+      "flipped_to_correct": false,
+      "top5_tokens": [
+        "11",
+        "10",
+        "12",
+        "9",
+        "13"
+      ]
+    },
+    {
+      "layer": 17,
+      "top_digit": "11",
+      "flipped_to_correct": false,
+      "top5_tokens": [
+        "12",
+        "11",
+        "13",
+        "10",
+        "9"
+      ]
+    },
+    {
+      "layer": 18,
+      "top_digit": "12",
+      "flipped_to_correct": false,
+      "top5_tokens": [
+        "12",
+        "11",
+        "13",
+        "10",
+        "9"
+      ]
+    },
+    {
+      "layer": 19,
+      "top_digit": "12",
+      "flipped_to_correct": false,
+      "top5_tokens": [
+        "12",
+        "11",
+        "13",
+        "10",
+        "9"
+      ]
+    },
+    {
+      "layer": 20,
+      "top_digit": "12",
+      "flipped_to_correct": false,
+      "top5_tokens": [
+        "12",
+        "11",
+        "13",
+        "10",
+        "14"
+      ]
+    },
+    {
+      "layer": 21,
+      "top_digit": "11",
+      "flipped_to_correct": false,
+      "top5_tokens": [
+        "11",
+        "12",
+        "10",
+        "13",
+        "9"
+      ]
+    },
+    {
+      "layer": 22,
+      "top_digit": "11",
+      "flipped_to_correct": false,
+      "top5_tokens": [
+        "11",
+        "12",
+        "10",
+        "13",
+        "9"
+      ]
+    },
+    {
+      "layer": 23,
+      "top_digit": "11",
+      "flipped_to_correct": false,
+      "top5_tokens": [
+        "11",
+        "12",
+        "10",
+        "9",
+        "13"
+      ]
+    },
+    {
+      "layer": 24,
+      "top_digit": "11",
+      "flipped_to_correct": false,
+      "top5_tokens": [
+        "11",
+        "12",
+        "10",
+        "9",
+        "13"
+      ]
+    },
+    {
+      "layer": 25,
+      "top_digit": "11",
+      "flipped_to_correct": false,
+      "top5_tokens": [
+        "11",
+        "12",
+        "10",
+        "9",
+        "13"
+      ]
+    },
+    {
+      "layer": 26,
+      "top_digit": "11",
+      "flipped_to_correct": false,
+      "top5_tokens": [
+        "11",
+        "12",
+        "10",
+        "9",
+        "13"
+      ]
+    },
+    {
+      "layer": 27,
+      "top_digit": "11",
+      "flipped_to_correct": false,
+      "top5_tokens": [
+        "11",
+        "12",
+        "10",
+        "9",
+        "13"
+      ]
+    },
+    {
+      "layer": 28,
+      "top_digit": "11",
+      "flipped_to_correct": false,
+      "top5_tokens": [
+        "11",
+        "12",
+        "10",
+        "9",
+        "13"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1235 @@
+{
+  "10": {
+    "n": 10,
+    "correct": 10,
+    "unpatched_digit": "8",
+    "flip_layers": [
+      12,
+      13,
+      14,
+      15,
+      16
+    ],
+    "earliest_causal": 12
+  },
+  "6": {
+    "n": 6,
+    "correct": 6,
+    "unpatched_digit": "3",
+    "sweep": [
+      {
+        "layer": 1,
+        "top_digit": "3",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "3",
+          "5",
+          "2",
+          "1",
+          "6"
+        ]
+      },
+      {
+        "layer": 2,
+        "top_digit": "3",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "3",
+          "5",
+          "2",
+          "1",
+          "6"
+        ]
+      },
+      {
+        "layer": 3,
+        "top_digit": "3",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "3",
+          "5",
+          "6",
+          "2",
+          "1"
+        ]
+      },
+      {
+        "layer": 4,
+        "top_digit": "3",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "3",
+          "5",
+          "6",
+          "8",
+          "2"
+        ]
+      },
+      {
+        "layer": 5,
+        "top_digit": "3",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "3",
+          "5",
+          "6",
+          "8",
+          "2"
+        ]
+      },
+      {
+        "layer": 6,
+        "top_digit": "3",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "3",
+          "5",
+          "2",
+          "6",
+          "1"
+        ]
+      },
+      {
+        "layer": 7,
+        "top_digit": "3",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "5",
+          "3",
+          "6",
+          "8",
+          "2"
+        ]
+      },
+      {
+        "layer": 8,
+        "top_digit": "3",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "3",
+          "5",
+          "6",
+          "2",
+          "8"
+        ]
+      },
+      {
+        "layer": 9,
+        "top_digit": "3",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "3",
+          "5",
+          "4",
+          "6",
+          "2"
+        ]
+      },
+      {
+        "layer": 10,
+        "top_digit": "8",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "8",
+          "10",
+          "7",
+          "9",
+          "6"
+        ]
+      },
+      {
+        "layer": 11,
+        "top_digit": "8",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "8",
+          "10",
+          "14",
+          "9",
+          "7"
+        ]
+      },
+      {
+        "layer": 12,
+        "top_digit": "8",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "8",
+          "6",
+          "10",
+          "7",
+          "9"
+        ]
+      },
+      {
+        "layer": 13,
+        "top_digit": "6",
+        "flipped_to_correct": true,
+        "top5_tokens": [
+          "6",
+          "8",
+          "10",
+          "7",
+          "9"
+        ]
+      },
+      {
+        "layer": 14,
+        "top_digit": "8",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "8",
+          "6",
+          "10",
+          "9",
+          "7"
+        ]
+      },
+      {
+        "layer": 15,
+        "top_digit": "8",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "8",
+          "10",
+          "6",
+          "9",
+          "7"
+        ]
+      },
+      {
+        "layer": 16,
+        "top_digit": "8",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "8",
+          "10",
+          "6",
+          "9",
+          "7"
+        ]
+      }
+    ],
+    "flip_layers": [
+      13
+    ],
+    "earliest_causal": 13
+  },
+  "7": {
+    "n": 7,
+    "correct": 7,
+    "unpatched_digit": "3",
+    "sweep": [
+      {
+        "layer": 1,
+        "top_digit": "3",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "5",
+          "3",
+          "8",
+          "6",
+          "2"
+        ]
+      },
+      {
+        "layer": 2,
+        "top_digit": "5",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "5",
+          "8",
+          "3",
+          "6",
+          "7"
+        ]
+      },
+      {
+        "layer": 3,
+        "top_digit": "5",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "5",
+          "8",
+          "6",
+          "3",
+          "7"
+        ]
+      },
+      {
+        "layer": 4,
+        "top_digit": "5",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "5",
+          "8",
+          "6",
+          "3",
+          "7"
+        ]
+      },
+      {
+        "layer": 5,
+        "top_digit": "5",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "5",
+          "8",
+          "6",
+          "3",
+          "7"
+        ]
+      },
+      {
+        "layer": 6,
+        "top_digit": "3",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "8",
+          "5",
+          "3",
+          "6",
+          "7"
+        ]
+      },
+      {
+        "layer": 7,
+        "top_digit": "5",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "5",
+          "8",
+          "6",
+          "3",
+          "7"
+        ]
+      },
+      {
+        "layer": 8,
+        "top_digit": "5",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "5",
+          "8",
+          "3",
+          "6",
+          "7"
+        ]
+      },
+      {
+        "layer": 9,
+        "top_digit": "3",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "5",
+          "3",
+          "8",
+          "6",
+          "4"
+        ]
+      },
+      {
+        "layer": 10,
+        "top_digit": "8",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "8",
+          "10",
+          "9",
+          "7",
+          "6"
+        ]
+      },
+      {
+        "layer": 11,
+        "top_digit": "14",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "14",
+          "10",
+          "8",
+          "9",
+          "11"
+        ]
+      },
+      {
+        "layer": 12,
+        "top_digit": "8",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "8",
+          "10",
+          "9",
+          "7",
+          "6"
+        ]
+      },
+      {
+        "layer": 13,
+        "top_digit": "8",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "8",
+          "10",
+          "9",
+          "7",
+          "6"
+        ]
+      },
+      {
+        "layer": 14,
+        "top_digit": "8",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "8",
+          "10",
+          "9",
+          "7",
+          "6"
+        ]
+      },
+      {
+        "layer": 15,
+        "top_digit": "10",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "10",
+          "8",
+          "9",
+          "11",
+          "7"
+        ]
+      },
+      {
+        "layer": 16,
+        "top_digit": "8",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "8",
+          "10",
+          "9",
+          "11",
+          "7"
+        ]
+      }
+    ],
+    "flip_layers": [],
+    "earliest_causal": null
+  },
+  "8": {
+    "n": 8,
+    "correct": 8,
+    "unpatched_digit": "8",
+    "sweep": [
+      {
+        "layer": 1,
+        "top_digit": "8",
+        "flipped_to_correct": true,
+        "top5_tokens": [
+          "8",
+          "6",
+          "5",
+          "7",
+          "3"
+        ]
+      },
+      {
+        "layer": 2,
+        "top_digit": "8",
+        "flipped_to_correct": true,
+        "top5_tokens": [
+          "8",
+          "6",
+          "5",
+          "7",
+          "3"
+        ]
+      },
+      {
+        "layer": 3,
+        "top_digit": "8",
+        "flipped_to_correct": true,
+        "top5_tokens": [
+          "8",
+          "6",
+          "7",
+          "5",
+          "3"
+        ]
+      },
+      {
+        "layer": 4,
+        "top_digit": "8",
+        "flipped_to_correct": true,
+        "top5_tokens": [
+          "8",
+          "6",
+          "7",
+          "5",
+          "10"
+        ]
+      },
+      {
+        "layer": 5,
+        "top_digit": "8",
+        "flipped_to_correct": true,
+        "top5_tokens": [
+          "8",
+          "6",
+          "7",
+          "5",
+          "10"
+        ]
+      },
+      {
+        "layer": 6,
+        "top_digit": "8",
+        "flipped_to_correct": true,
+        "top5_tokens": [
+          "8",
+          "6",
+          "5",
+          "7",
+          "3"
+        ]
+      },
+      {
+        "layer": 7,
+        "top_digit": "8",
+        "flipped_to_correct": true,
+        "top5_tokens": [
+          "8",
+          "6",
+          "5",
+          "7",
+          "3"
+        ]
+      },
+      {
+        "layer": 8,
+        "top_digit": "8",
+        "flipped_to_correct": true,
+        "top5_tokens": [
+          "8",
+          "7",
+          "5",
+          "6",
+          "3"
+        ]
+      },
+      {
+        "layer": 9,
+        "top_digit": "8",
+        "flipped_to_correct": true,
+        "top5_tokens": [
+          "8",
+          "5",
+          "6",
+          "3",
+          "7"
+        ]
+      },
+      {
+        "layer": 10,
+        "top_digit": "8",
+        "flipped_to_correct": true,
+        "top5_tokens": [
+          "8",
+          "10",
+          "9",
+          "14",
+          "7"
+        ]
+      },
+      {
+        "layer": 11,
+        "top_digit": "14",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "14",
+          "10",
+          "15",
+          "9",
+          "8"
+        ]
+      },
+      {
+        "layer": 12,
+        "top_digit": "8",
+        "flipped_to_correct": true,
+        "top5_tokens": [
+          "8",
+          "10",
+          "9",
+          "7",
+          "6"
+        ]
+      },
+      {
+        "layer": 13,
+        "top_digit": "10",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "10",
+          "8",
+          "9",
+          "7",
+          "6"
+        ]
+      },
+      {
+        "layer": 14,
+        "top_digit": "10",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "10",
+          "8",
+          "9",
+          "11",
+          "7"
+        ]
+      },
+      {
+        "layer": 15,
+        "top_digit": "10",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "10",
+          "8",
+          "9",
+          "11",
+          "6"
+        ]
+      },
+      {
+        "layer": 16,
+        "top_digit": "10",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "10",
+          "8",
+          "9",
+          "11",
+          "7"
+        ]
+      }
+    ],
+    "flip_layers": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      12
+    ],
+    "earliest_causal": 1
+  },
+  "9": {
+    "n": 9,
+    "correct": 9,
+    "unpatched_digit": "8",
+    "sweep": [
+      {
+        "layer": 1,
+        "top_digit": "8",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "8",
+          "10",
+          "7",
+          "6",
+          "5"
+        ]
+      },
+      {
+        "layer": 2,
+        "top_digit": "8",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "8",
+          "10",
+          "6",
+          "7",
+          "5"
+        ]
+      },
+      {
+        "layer": 3,
+        "top_digit": "8",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "8",
+          "10",
+          "6",
+          "7",
+          "5"
+        ]
+      },
+      {
+        "layer": 4,
+        "top_digit": "8",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "8",
+          "10",
+          "7",
+          "6",
+          "5"
+        ]
+      },
+      {
+        "layer": 5,
+        "top_digit": "8",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "8",
+          "10",
+          "7",
+          "6",
+          "5"
+        ]
+      },
+      {
+        "layer": 6,
+        "top_digit": "8",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "8",
+          "7",
+          "6",
+          "10",
+          "5"
+        ]
+      },
+      {
+        "layer": 7,
+        "top_digit": "8",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "8",
+          "10",
+          "7",
+          "6",
+          "5"
+        ]
+      },
+      {
+        "layer": 8,
+        "top_digit": "8",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "8",
+          "10",
+          "7",
+          "6",
+          "5"
+        ]
+      },
+      {
+        "layer": 9,
+        "top_digit": "8",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "8",
+          "5",
+          "7",
+          "6",
+          "3"
+        ]
+      },
+      {
+        "layer": 10,
+        "top_digit": "10",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "10",
+          "8",
+          "9",
+          "14",
+          "12"
+        ]
+      },
+      {
+        "layer": 11,
+        "top_digit": "14",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "14",
+          "15",
+          "10",
+          "12",
+          "11"
+        ]
+      },
+      {
+        "layer": 12,
+        "top_digit": "10",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "10",
+          "8",
+          "9",
+          "7",
+          "6"
+        ]
+      },
+      {
+        "layer": 13,
+        "top_digit": "10",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "10",
+          "8",
+          "9",
+          "7",
+          "6"
+        ]
+      },
+      {
+        "layer": 14,
+        "top_digit": "10",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "10",
+          "8",
+          "9",
+          "11",
+          "7"
+        ]
+      },
+      {
+        "layer": 15,
+        "top_digit": "10",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "10",
+          "9",
+          "8",
+          "14",
+          "11"
+        ]
+      },
+      {
+        "layer": 16,
+        "top_digit": "10",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "10",
+          "9",
+          "8",
+          "11",
+          "7"
+        ]
+      }
+    ],
+    "flip_layers": [],
+    "earliest_causal": null
+  },
+  "11": {
+    "n": 11,
+    "correct": 11,
+    "unpatched_digit": "8",
+    "sweep": [
+      {
+        "layer": 1,
+        "top_digit": "8",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "8",
+          "10",
+          "12",
+          "9",
+          "7"
+        ]
+      },
+      {
+        "layer": 2,
+        "top_digit": "8",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "8",
+          "10",
+          "12",
+          "9",
+          "7"
+        ]
+      },
+      {
+        "layer": 3,
+        "top_digit": "8",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "8",
+          "10",
+          "12",
+          "9",
+          "7"
+        ]
+      },
+      {
+        "layer": 4,
+        "top_digit": "8",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "8",
+          "10",
+          "12",
+          "9",
+          "7"
+        ]
+      },
+      {
+        "layer": 5,
+        "top_digit": "8",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "8",
+          "10",
+          "12",
+          "15",
+          "9"
+        ]
+      },
+      {
+        "layer": 6,
+        "top_digit": "8",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "8",
+          "10",
+          "12",
+          "9",
+          "7"
+        ]
+      },
+      {
+        "layer": 7,
+        "top_digit": "8",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "8",
+          "10",
+          "9",
+          "12",
+          "7"
+        ]
+      },
+      {
+        "layer": 8,
+        "top_digit": "8",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "8",
+          "10",
+          "12",
+          "9",
+          "7"
+        ]
+      },
+      {
+        "layer": 9,
+        "top_digit": "8",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "8",
+          "10",
+          "7",
+          "9",
+          "5"
+        ]
+      },
+      {
+        "layer": 10,
+        "top_digit": "14",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "14",
+          "15",
+          "12",
+          "11",
+          "10"
+        ]
+      },
+      {
+        "layer": 11,
+        "top_digit": "14",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "14",
+          "17",
+          "15",
+          "16",
+          "12"
+        ]
+      },
+      {
+        "layer": 12,
+        "top_digit": "10",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "10",
+          "14",
+          "9",
+          "8",
+          "11"
+        ]
+      },
+      {
+        "layer": 13,
+        "top_digit": "10",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "10",
+          "14",
+          "9",
+          "8",
+          "11"
+        ]
+      },
+      {
+        "layer": 14,
+        "top_digit": "10",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "10",
+          "14",
+          "11",
+          "9",
+          "8"
+        ]
+      },
+      {
+        "layer": 15,
+        "top_digit": "10",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "14",
+          "10",
+          "11",
+          "9",
+          "8"
+        ]
+      },
+      {
+        "layer": 16,
+        "top_digit": "10",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "10",
+          "14",
+          "9",
+          "8",
+          "12"
+        ]
+      }
+    ],
+    "flip_layers": [],
+    "earliest_causal": null
+  },
+  "12": {
+    "n": 12,
+    "correct": 12,
+    "unpatched_digit": "8",
+    "sweep": [
+      {
+        "layer": 1,
+        "top_digit": "8",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "8",
+          "10",
+          "12",
+          "15",
+          "9"
+        ]
+      },
+      {
+        "layer": 2,
+        "top_digit": "8",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "8",
+          "10",
+          "12",
+          "9",
+          "7"
+        ]
+      },
+      {
+        "layer": 3,
+        "top_digit": "8",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "8",
+          "10",
+          "12",
+          "15",
+          "14"
+        ]
+      },
+      {
+        "layer": 4,
+        "top_digit": "8",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "8",
+          "10",
+          "12",
+          "14",
+          "15"
+        ]
+      },
+      {
+        "layer": 5,
+        "top_digit": "8",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "8",
+          "10",
+          "14",
+          "15",
+          "12"
+        ]
+      },
+      {
+        "layer": 6,
+        "top_digit": "8",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "8",
+          "10",
+          "12",
+          "15",
+          "9"
+        ]
+      },
+      {
+        "layer": 7,
+        "top_digit": "8",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "8",
+          "10",
+          "12",
+          "14",
+          "9"
+        ]
+      },
+      {
+        "layer": 8,
+        "top_digit": "8",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "8",
+          "10",
+          "12",
+          "15",
+          "9"
+        ]
+      },
+      {
+        "layer": 9,
+        "top_digit": "8",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "8",
+          "9",
+          "5",
+          "10",
+          "7"
+        ]
+      },
+      {
+        "layer": 10,
+        "top_digit": "14",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "14",
+          "15",
+          "12",
+          "10",
+          "11"
+        ]
+      },
+      {
+        "layer": 11,
+        "top_digit": "14",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "14",
+          "17",
+          "15",
+          "19",
+          "12"
+        ]
+      },
+      {
+        "layer": 12,
+        "top_digit": "10",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "10",
+          "14",
+          "8",
+          "9",
+          "11"
+        ]
+      },
+      {
+        "layer": 13,
+        "top_digit": "10",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "10",
+          "14",
+          "8",
+          "9",
+          "11"
+        ]
+      },
+      {
+        "layer": 14,
+        "top_digit": "10",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "10",
+          "14",
+          "8",
+          "9",
+          "11"
+        ]
+      },
+      {
+        "layer": 15,
+        "top_digit": "10",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "10",
+          "14",
+          "8",
+          "9",
+          "11"
+        ]
+      },
+      {
+        "layer": 16,
+        "top_digit": "10",
+        "flipped_to_correct": false,
+        "top5_tokens": [
+          "10",
+          "14",
+          "8",
+          "9",
+          "11"
+        ]
+      }
+    ],
+    "flip_layers": [],
+    "earliest_causal": null
+  }
+}

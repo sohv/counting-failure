@@ -1,0 +1,458 @@
+{
+  "phase1_baseline_L11": {
+    "phase": "phase1_baseline",
+    "layer": 11,
+    "attractor": "8",
+    "h_before": {
+      "top_digit": "5",
+      "top5": [
+        " quantity",
+        "olor",
+        "umann",
+        "anding",
+        " eins"
+      ],
+      "margin": 0.7969
+    },
+    "h_post_attn": {
+      "top_digit": "3",
+      "top5": [
+        " quantity",
+        " count",
+        " counting",
+        "peated",
+        " counted"
+      ],
+      "margin": 0.1094
+    },
+    "h_post_layer": {
+      "top_digit": "3",
+      "top5": [
+        "och",
+        "unk",
+        "\u00f3w",
+        " singleton",
+        "ato"
+      ],
+      "margin": 0.0312
+    }
+  },
+  "phase1_baseline_L12": {
+    "phase": "phase1_baseline",
+    "layer": 12,
+    "attractor": "8",
+    "h_before": {
+      "top_digit": "3",
+      "top5": [
+        "och",
+        "unk",
+        "\u00f3w",
+        " singleton",
+        "ato"
+      ],
+      "margin": 0.0312
+    },
+    "h_post_attn": {
+      "top_digit": "1",
+      "top5": [
+        " counting",
+        " counted",
+        " count",
+        " singleton",
+        " quantity"
+      ],
+      "margin": 1.0625
+    },
+    "h_post_layer": {
+      "top_digit": "12",
+      "top5": [
+        "bilt",
+        "obl",
+        "chantment",
+        "\u4e09\u4e2a",
+        "ador"
+      ],
+      "margin": 0.1562
+    }
+  },
+  "phase1_baseline_L13": {
+    "phase": "phase1_baseline",
+    "layer": 13,
+    "attractor": "8",
+    "h_before": {
+      "top_digit": "12",
+      "top5": [
+        "bilt",
+        "obl",
+        "chantment",
+        "\u4e09\u4e2a",
+        "ador"
+      ],
+      "margin": 0.1562
+    },
+    "h_post_attn": {
+      "top_digit": "12",
+      "top5": [
+        "obl",
+        "chantment",
+        "bilt",
+        "omp",
+        "\u4e09\u4e2a"
+      ],
+      "margin": 0.2812
+    },
+    "h_post_layer": {
+      "top_digit": "12",
+      "top5": [
+        "12",
+        "8",
+        "10",
+        " eight",
+        "6"
+      ],
+      "margin": 0.625
+    }
+  },
+  "phase1_baseline_L14": {
+    "phase": "phase1_baseline",
+    "layer": 14,
+    "attractor": "8",
+    "h_before": {
+      "top_digit": "12",
+      "top5": [
+        "12",
+        "8",
+        "10",
+        " eight",
+        "6"
+      ],
+      "margin": 0.625
+    },
+    "h_post_attn": {
+      "top_digit": "12",
+      "top5": [
+        "12",
+        "10",
+        "8",
+        " eight",
+        "6"
+      ],
+      "margin": 0.1875
+    },
+    "h_post_layer": {
+      "top_digit": "8",
+      "top5": [
+        "8",
+        "7",
+        "5",
+        "12",
+        "6"
+      ],
+      "margin": 1.0
+    }
+  },
+  "phase1_baseline_L15": {
+    "phase": "phase1_baseline",
+    "layer": 15,
+    "attractor": "8",
+    "h_before": {
+      "top_digit": "8",
+      "top5": [
+        "8",
+        "7",
+        "5",
+        "12",
+        "6"
+      ],
+      "margin": 1.0
+    },
+    "h_post_attn": {
+      "top_digit": "8",
+      "top5": [
+        "8",
+        "7",
+        "5",
+        "12",
+        "6"
+      ],
+      "margin": 0.6875
+    },
+    "h_post_layer": {
+      "top_digit": "8",
+      "top5": [
+        "8",
+        "10",
+        "7",
+        "9",
+        "5"
+      ],
+      "margin": 0.5625
+    }
+  },
+  "phase1_baseline_L16": {
+    "phase": "phase1_baseline",
+    "layer": 16,
+    "attractor": "8",
+    "h_before": {
+      "top_digit": "8",
+      "top5": [
+        "8",
+        "10",
+        "7",
+        "9",
+        "5"
+      ],
+      "margin": 0.5625
+    },
+    "h_post_attn": {
+      "top_digit": "8",
+      "top5": [
+        "8",
+        "7",
+        "10",
+        "5",
+        "9"
+      ],
+      "margin": 0.625
+    },
+    "h_post_layer": {
+      "top_digit": "8",
+      "top5": [
+        "8",
+        "10",
+        "7",
+        "9",
+        "6"
+      ],
+      "margin": 0.5
+    }
+  },
+  "phase3_control_L11": {
+    "phase": "phase3_control",
+    "layer": 11,
+    "attractor": "10",
+    "h_before": {
+      "top_digit": "7",
+      "top5": [
+        "\ud569",
+        "venta",
+        "umann",
+        "gan",
+        " seventy"
+      ],
+      "margin": 0.2969
+    },
+    "h_post_attn": {
+      "top_digit": "5",
+      "top5": [
+        "venta",
+        " \u0441\u0447\u0435\u0442",
+        " counters",
+        " counted",
+        "\ud569"
+      ],
+      "margin": 0.3906
+    },
+    "h_post_layer": {
+      "top_digit": "5",
+      "top5": [
+        "och",
+        " \u0441\u0447\u0435\u0442",
+        " counted",
+        "Quantity",
+        "ending"
+      ],
+      "margin": 0.4062
+    }
+  },
+  "phase3_control_L12": {
+    "phase": "phase3_control",
+    "layer": 12,
+    "attractor": "10",
+    "h_before": {
+      "top_digit": "5",
+      "top5": [
+        "och",
+        " \u0441\u0447\u0435\u0442",
+        " counted",
+        "Quantity",
+        "ending"
+      ],
+      "margin": 0.4062
+    },
+    "h_post_attn": {
+      "top_digit": "5",
+      "top5": [
+        " counted",
+        " \u0441\u0447\u0435\u0442",
+        " count",
+        " counting",
+        "(count"
+      ],
+      "margin": 0.0938
+    },
+    "h_post_layer": {
+      "top_digit": "12",
+      "top5": [
+        " counted",
+        " eight",
+        " word",
+        "pend",
+        " counting"
+      ],
+      "margin": 1.1875
+    }
+  },
+  "phase3_control_L13": {
+    "phase": "phase3_control",
+    "layer": 13,
+    "attractor": "10",
+    "h_before": {
+      "top_digit": "12",
+      "top5": [
+        " counted",
+        " eight",
+        " word",
+        "pend",
+        " counting"
+      ],
+      "margin": 1.1875
+    },
+    "h_post_attn": {
+      "top_digit": "12",
+      "top5": [
+        " counted",
+        "pend",
+        " counting",
+        " eight",
+        " word"
+      ],
+      "margin": 1.125
+    },
+    "h_post_layer": {
+      "top_digit": "8",
+      "top5": [
+        "seven",
+        " counted",
+        "eight",
+        "12",
+        "8"
+      ],
+      "margin": 0.0
+    }
+  },
+  "phase3_control_L14": {
+    "phase": "phase3_control",
+    "layer": 14,
+    "attractor": "10",
+    "h_before": {
+      "top_digit": "8",
+      "top5": [
+        "seven",
+        " counted",
+        "eight",
+        "12",
+        "8"
+      ],
+      "margin": 0.0
+    },
+    "h_post_attn": {
+      "top_digit": "8",
+      "top5": [
+        " counted",
+        "vala",
+        "there",
+        "ver",
+        "endo"
+      ],
+      "margin": 0.375
+    },
+    "h_post_layer": {
+      "top_digit": "8",
+      "top5": [
+        "8",
+        "ob",
+        "13",
+        "7",
+        "zel"
+      ],
+      "margin": 1.0625
+    }
+  },
+  "phase3_control_L15": {
+    "phase": "phase3_control",
+    "layer": 15,
+    "attractor": "10",
+    "h_before": {
+      "top_digit": "8",
+      "top5": [
+        "8",
+        "ob",
+        "13",
+        "7",
+        "zel"
+      ],
+      "margin": 1.0625
+    },
+    "h_post_attn": {
+      "top_digit": "8",
+      "top5": [
+        "8",
+        "zel",
+        "7",
+        "13",
+        "11"
+      ],
+      "margin": 1.0
+    },
+    "h_post_layer": {
+      "top_digit": "13",
+      "top5": [
+        "13",
+        "10",
+        "14",
+        "11",
+        "9"
+      ],
+      "margin": 0.125
+    }
+  },
+  "phase3_control_L16": {
+    "phase": "phase3_control",
+    "layer": 16,
+    "attractor": "10",
+    "h_before": {
+      "top_digit": "13",
+      "top5": [
+        "13",
+        "10",
+        "14",
+        "11",
+        "9"
+      ],
+      "margin": 0.125
+    },
+    "h_post_attn": {
+      "top_digit": "10",
+      "top5": [
+        "10",
+        "14",
+        "9",
+        "15",
+        "11"
+      ],
+      "margin": 0.1875
+    },
+    "h_post_layer": {
+      "top_digit": "10",
+      "top5": [
+        "10",
+        "9",
+        "8",
+        "14",
+        "11"
+      ],
+      "margin": 0.25
+    }
+  }
+}

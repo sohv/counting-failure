@@ -2,3 +2,7 @@
 .env
 .env/
 __pycache__/
+project_log.md
+usage.md
+.python-version
+uv.lock

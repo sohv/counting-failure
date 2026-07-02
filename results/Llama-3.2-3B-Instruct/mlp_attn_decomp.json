@@ -1,0 +1,534 @@
+{
+  "phase1_baseline_L22": {
+    "phase": "phase1_baseline",
+    "layer": 22,
+    "attractor": "14",
+    "h_before": {
+      "top_digit": "8",
+      "top5": [
+        " eight",
+        " seven",
+        " five",
+        " six",
+        " nine"
+      ],
+      "margin": 1.3125
+    },
+    "h_post_attn": {
+      "top_digit": "8",
+      "top5": [
+        " eight",
+        " seven",
+        " five",
+        " six",
+        " nine"
+      ],
+      "margin": 1.0938
+    },
+    "h_post_layer": {
+      "top_digit": "14",
+      "top5": [
+        "14",
+        " eight",
+        "8",
+        "10",
+        " ten"
+      ],
+      "margin": 0.375
+    }
+  },
+  "phase1_baseline_L23": {
+    "phase": "phase1_baseline",
+    "layer": 23,
+    "attractor": "14",
+    "h_before": {
+      "top_digit": "14",
+      "top5": [
+        "14",
+        " eight",
+        "8",
+        "10",
+        " ten"
+      ],
+      "margin": 0.375
+    },
+    "h_post_attn": {
+      "top_digit": "14",
+      "top5": [
+        " apple",
+        "14",
+        " eight",
+        "10",
+        "8"
+      ],
+      "margin": 0.6875
+    },
+    "h_post_layer": {
+      "top_digit": "14",
+      "top5": [
+        " eight",
+        " apple",
+        "14",
+        "8",
+        "10"
+      ],
+      "margin": 0.0312
+    }
+  },
+  "phase1_baseline_L24": {
+    "phase": "phase1_baseline",
+    "layer": 24,
+    "attractor": "14",
+    "h_before": {
+      "top_digit": "14",
+      "top5": [
+        " eight",
+        " apple",
+        "14",
+        "8",
+        "10"
+      ],
+      "margin": 0.0312
+    },
+    "h_post_attn": {
+      "top_digit": "10",
+      "top5": [
+        "10",
+        "8",
+        "14",
+        "11",
+        "12"
+      ],
+      "margin": 0.0625
+    },
+    "h_post_layer": {
+      "top_digit": "10",
+      "top5": [
+        "10",
+        "14",
+        "11",
+        "12",
+        "8"
+      ],
+      "margin": 0.125
+    }
+  },
+  "phase1_baseline_L25": {
+    "phase": "phase1_baseline",
+    "layer": 25,
+    "attractor": "14",
+    "h_before": {
+      "top_digit": "10",
+      "top5": [
+        "10",
+        "14",
+        "11",
+        "12",
+        "8"
+      ],
+      "margin": 0.125
+    },
+    "h_post_attn": {
+      "top_digit": "10",
+      "top5": [
+        "10",
+        "14",
+        "8",
+        "12",
+        "11"
+      ],
+      "margin": 0.25
+    },
+    "h_post_layer": {
+      "top_digit": "10",
+      "top5": [
+        "10",
+        "14",
+        " ten",
+        "13",
+        "12"
+      ],
+      "margin": 1.125
+    }
+  },
+  "phase1_baseline_L26": {
+    "phase": "phase1_baseline",
+    "layer": 26,
+    "attractor": "14",
+    "h_before": {
+      "top_digit": "10",
+      "top5": [
+        "10",
+        "14",
+        " ten",
+        "13",
+        "12"
+      ],
+      "margin": 1.125
+    },
+    "h_post_attn": {
+      "top_digit": "10",
+      "top5": [
+        "10",
+        "14",
+        " ten",
+        "11",
+        "12"
+      ],
+      "margin": 1.4375
+    },
+    "h_post_layer": {
+      "top_digit": "14",
+      "top5": [
+        "14",
+        "10",
+        "13",
+        "12",
+        "11"
+      ],
+      "margin": 0.25
+    }
+  },
+  "phase1_baseline_L27": {
+    "phase": "phase1_baseline",
+    "layer": 27,
+    "attractor": "14",
+    "h_before": {
+      "top_digit": "14",
+      "top5": [
+        "14",
+        "10",
+        "13",
+        "12",
+        "11"
+      ],
+      "margin": 0.25
+    },
+    "h_post_attn": {
+      "top_digit": "14",
+      "top5": [
+        "14",
+        "10",
+        "12",
+        "13",
+        "11"
+      ],
+      "margin": 0.5
+    },
+    "h_post_layer": {
+      "top_digit": "14",
+      "top5": [
+        "14",
+        "10",
+        "12",
+        "11",
+        "13"
+      ],
+      "margin": 0.5
+    }
+  },
+  "phase1_baseline_L28": {
+    "phase": "phase1_baseline",
+    "layer": 28,
+    "attractor": "14",
+    "h_before": {
+      "top_digit": "14",
+      "top5": [
+        "14",
+        "10",
+        "12",
+        "11",
+        "13"
+      ],
+      "margin": 0.5
+    },
+    "h_post_attn": {
+      "top_digit": "14",
+      "top5": [
+        "14",
+        "10",
+        "12",
+        "11",
+        "13"
+      ],
+      "margin": 0.6875
+    },
+    "h_post_layer": {
+      "top_digit": "14",
+      "top5": [
+        "14",
+        "10",
+        "13",
+        "12",
+        "11"
+      ],
+      "margin": 2.375
+    }
+  },
+  "phase3_control_L22": {
+    "phase": "phase3_control",
+    "layer": 22,
+    "attractor": "11",
+    "h_before": {
+      "top_digit": "7",
+      "top5": [
+        "7",
+        " seven",
+        " nine",
+        " eight",
+        " six"
+      ],
+      "margin": 1.2188
+    },
+    "h_post_attn": {
+      "top_digit": "7",
+      "top5": [
+        " list",
+        "7",
+        " seven",
+        "gro",
+        " nine"
+      ],
+      "margin": 1.4062
+    },
+    "h_post_layer": {
+      "top_digit": "7",
+      "top5": [
+        " list",
+        " Pump",
+        " nine",
+        "listed",
+        "liste"
+      ],
+      "margin": 0.0
+    }
+  },
+  "phase3_control_L23": {
+    "phase": "phase3_control",
+    "layer": 23,
+    "attractor": "11",
+    "h_before": {
+      "top_digit": "7",
+      "top5": [
+        " list",
+        " Pump",
+        " nine",
+        "listed",
+        "liste"
+      ],
+      "margin": 0.0
+    },
+    "h_post_attn": {
+      "top_digit": "9",
+      "top5": [
+        " list",
+        " Pump",
+        " nine",
+        "listed",
+        "(list"
+      ],
+      "margin": 0.0938
+    },
+    "h_post_layer": {
+      "top_digit": "17",
+      "top5": [
+        " nine",
+        " Pump",
+        " thirteen",
+        " eight",
+        " eleven"
+      ],
+      "margin": 0.2188
+    }
+  },
+  "phase3_control_L24": {
+    "phase": "phase3_control",
+    "layer": 24,
+    "attractor": "11",
+    "h_before": {
+      "top_digit": "17",
+      "top5": [
+        " nine",
+        " Pump",
+        " thirteen",
+        " eight",
+        " eleven"
+      ],
+      "margin": 0.2188
+    },
+    "h_post_attn": {
+      "top_digit": "9",
+      "top5": [
+        "9",
+        "17",
+        " nine",
+        "10",
+        "7"
+      ],
+      "margin": 0.1875
+    },
+    "h_post_layer": {
+      "top_digit": "17",
+      "top5": [
+        "17",
+        "10",
+        "11",
+        "12",
+        "13"
+      ],
+      "margin": 0.1875
+    }
+  },
+  "phase3_control_L25": {
+    "phase": "phase3_control",
+    "layer": 25,
+    "attractor": "11",
+    "h_before": {
+      "top_digit": "17",
+      "top5": [
+        "17",
+        "10",
+        "11",
+        "12",
+        "13"
+      ],
+      "margin": 0.1875
+    },
+    "h_post_attn": {
+      "top_digit": "17",
+      "top5": [
+        "17",
+        "11",
+        "10",
+        "12",
+        "9"
+      ],
+      "margin": 0.25
+    },
+    "h_post_layer": {
+      "top_digit": "10",
+      "top5": [
+        "10",
+        " nine",
+        "9",
+        "11",
+        "12"
+      ],
+      "margin": 0.5625
+    }
+  },
+  "phase3_control_L26": {
+    "phase": "phase3_control",
+    "layer": 26,
+    "attractor": "11",
+    "h_before": {
+      "top_digit": "10",
+      "top5": [
+        "10",
+        " nine",
+        "9",
+        "11",
+        "12"
+      ],
+      "margin": 0.5625
+    },
+    "h_post_attn": {
+      "top_digit": "9",
+      "top5": [
+        "9",
+        "10",
+        " nine",
+        "11",
+        "12"
+      ],
+      "margin": 0.25
+    },
+    "h_post_layer": {
+      "top_digit": "11",
+      "top5": [
+        "11",
+        "10",
+        "9",
+        "12",
+        "13"
+      ],
+      "margin": 0.25
+    }
+  },
+  "phase3_control_L27": {
+    "phase": "phase3_control",
+    "layer": 27,
+    "attractor": "11",
+    "h_before": {
+      "top_digit": "11",
+      "top5": [
+        "11",
+        "10",
+        "9",
+        "12",
+        "13"
+      ],
+      "margin": 0.25
+    },
+    "h_post_attn": {
+      "top_digit": "11",
+      "top5": [
+        "11",
+        "9",
+        "10",
+        "12",
+        "13"
+      ],
+      "margin": 0.0625
+    },
+    "h_post_layer": {
+      "top_digit": "11",
+      "top5": [
+        "11",
+        "10",
+        "12",
+        "9",
+        "13"
+      ],
+      "margin": 0.75
+    }
+  },
+  "phase3_control_L28": {
+    "phase": "phase3_control",
+    "layer": 28,
+    "attractor": "11",
+    "h_before": {
+      "top_digit": "11",
+      "top5": [
+        "11",
+        "10",
+        "12",
+        "9",
+        "13"
+      ],
+      "margin": 0.75
+    },
+    "h_post_attn": {
+      "top_digit": "11",
+      "top5": [
+        "11",
+        "10",
+        "12",
+        "9",
+        "13"
+      ],
+      "margin": 0.5
+    },
+    "h_post_layer": {
+      "top_digit": "11",
+      "top5": [
+        "11",
+        "12",
+        "10",
+        "9",
+        "13"
+      ],
+      "margin": 0.5
+    }
+  }
+}
