@@ -18,10 +18,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch
 
-import src._paths as _paths  # noqa: F401  (adds config/ and data/ to sys.path)
+import _paths  # noqa: F401  (adds config/ and data/ to sys.path)
 from config import add_model_arg, get_config, output_path
 from prompts import PROMPTS
-from src.utils import load_eager_model, make_inputs_eager
+from utils import load_eager_model, make_inputs_eager
 
 
 def get_attentions(tokenizer, model_eager, prompt_text: str):

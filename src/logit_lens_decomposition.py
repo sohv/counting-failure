@@ -26,10 +26,10 @@ import json
 
 import torch
 
-import src._paths as _paths  # noqa: F401  (adds config/ and data/ to sys.path)
+import _paths  # noqa: F401  (adds config/ and data/ to sys.path)
 from config import add_model_arg, get_config, output_path
 from prompts import PARAPHRASES, PROMPTS, make_prompt_repeated
-from src.utils import (
+from utils import (
     decompose_layer,
     get_top_digit,
     get_top_digit_and_margin,

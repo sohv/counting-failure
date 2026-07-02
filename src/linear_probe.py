@@ -21,10 +21,10 @@ from sklearn.metrics import mean_absolute_error, r2_score
 from sklearn.model_selection import LeaveOneOut
 from sklearn.preprocessing import StandardScaler
 
-import src._paths as _paths  # noqa: F401  (adds config/ and data/ to sys.path)
+import _paths  # noqa: F401  (adds config/ and data/ to sys.path)
 from config import add_model_arg, get_config, output_path
 from prompts import UNIQUE_VOCAB, make_prompt_repeated, make_prompt_unique
-from src.utils import get_hidden_states_last_token, load_eager_model
+from utils import get_hidden_states_last_token, load_eager_model
 
 
 def run_loo_probe(hidden_array: np.ndarray, labels: np.ndarray):

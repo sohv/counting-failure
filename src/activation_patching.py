@@ -17,10 +17,10 @@ import json
 
 import torch
 
-import src._paths as _paths  # noqa: F401  (adds config/ and data/ to sys.path)
+import _paths  # noqa: F401  (adds config/ and data/ to sys.path)
 from config import add_model_arg, get_config, output_path
 from prompts import PROMPTS, make_prompt_numbered, make_prompt_repeated, make_prompt_unique
-from src.utils import get_top_digit, load_eager_model, make_inputs_eager, remove_all_hooks
+from utils import get_top_digit, load_eager_model, make_inputs_eager, remove_all_hooks
 
 
 def patch_layer_sweep(tokenizer, model_eager, source_inputs, target_inputs, correct_str: str, n_layers: int):

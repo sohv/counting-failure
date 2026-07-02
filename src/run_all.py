@@ -7,7 +7,7 @@ results/<model short name>/ (e.g. results/Llama-3.2-1B-Instruct/).
 
 Usage:
     python run_all.py --model 1b
-    python run_all.py --model 3b
+    python run_all.py --model 3b --only behavioral_experiment
     python run_all.py --model 1b --only behavioral_experiment attention_sink
 """
 
@@ -16,7 +16,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-import src._paths as _paths  # noqa: F401  (adds config/ and data/ to sys.path)
+import _paths  # noqa: F401  (adds config/ and data/ to sys.path)
 from config import add_model_arg, get_config
 
 STAGES = [

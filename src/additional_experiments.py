@@ -19,10 +19,10 @@ import re
 
 import torch
 
-import src._paths as _paths  # noqa: F401  (adds config/ and data/ to sys.path)
+import _paths  # noqa: F401  (adds config/ and data/ to sys.path)
 from config import add_model_arg, get_config, output_path
 from prompts import make_prompt_repeated
-from src.utils import (
+from utils import (
     extract_count,
     generate,
     get_top_digit,

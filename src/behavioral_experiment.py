@@ -14,16 +14,17 @@ Usage:
 
 import argparse
 import json
+import random
 
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 import numpy as np
 import torch
 
-import src._paths as _paths  # noqa: F401  (adds config/ and data/ to sys.path)
+import _paths  # noqa: F401  (adds config/ and data/ to sys.path)
 from config import N_RUNS, SEEDS, TEMPERATURE, MAX_NEW_TOKENS, add_model_arg, get_config, output_path
 from prompts import PROMPTS, PROMPTS_FIXED, UNIQUE_VOCAB, make_prompt_repeated, make_prompt_unique
-from src.utils import PhaseSummary, extract_count, generate, load_generation_model, run_single
+from utils import PhaseSummary, extract_count, generate, load_generation_model, run_single
 
 
 def run_all_phases(pipe, tokenizer) -> dict:
@@ -303,6 +304,16 @@ def paraphrase_robustness(cfg, pipe, tokenizer, all_results: dict):
             else:
                 prompt = template.format(list=word_list)
 
+            # Seed before every inference call so that the marginal cases
+            # (e.g. how_many/P2 where logits for 8 and 9 are nearly tied)
+            # are stable across runs.  The original notebook did not seed
+            # here, which caused how_many/P2 to flip between 8 and 9
+            # across runs; with do_sample=False the result should be
+            # deterministic given the same GPU state, so seeding makes that
+            # GPU-state dependency explicit and removes the flip.
+            torch.manual_seed(0)
+            random.seed(0)
+            np.random.seed(0)
             raw = generate(pipe, tokenizer, prompt, max_new_tokens=8)
             predicted = extract_count(raw)
             correct = "✓" if predicted == expected else "✗"
