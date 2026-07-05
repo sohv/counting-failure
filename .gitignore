@@ -18,3 +18,4 @@ results/
 .ipynb_checkpoints/
 wandb/
 *.log
+*.ipynb

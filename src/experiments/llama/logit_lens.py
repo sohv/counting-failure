@@ -7,7 +7,7 @@ For models with critical_layers=None (Qwen), runs a full layer sweep first
 to auto-discover the writer layer.
 
 Usage:
-    uv run -m src.experiments.logit_lens --model llama-1b
+    uv run -m src.experiments.llama.logit_lens --model llama-1b
 """
 
 import argparse

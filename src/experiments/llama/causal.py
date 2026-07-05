@@ -8,7 +8,7 @@ E3: Denoising patch (inject correct MLP output into failing case, norm-matched).
 Supplementary: full-residual patching sweep, steering vector.
 
 Usage:
-    uv run -m src.experiments.causal --model llama-1b
+    uv run -m src.experiments.llama.causal --model llama-1b
 """
 
 import argparse

@@ -4,8 +4,8 @@ Each stage runs as a subprocess so a crash in one stage does not take down
 earlier results. Results land in results/<model short name>/.
 
 Usage:
-    uv run -m src.experiments.run_all --model llama-1b
-    uv run -m src.experiments.run_all --model qwen-3b --only behavioral linear_probe
+    uv run -m src.experiments.llama.run_all --model llama-1b
+    uv run -m src.experiments.llama.run_all --model qwen-3b --only behavioral linear_probe
 """
 
 import argparse
@@ -39,7 +39,8 @@ def main():
     print(f"Running {len(stages)} stage(s) for {cfg.key} ({cfg.model_name})\n")
 
     for stage in stages:
-        module = f"src.experiments.{stage}"
+        prefix = "src.experiments" if stage == "behavioral" else "src.experiments.llama"
+        module = f"{prefix}.{stage}"
         print(f"\n{stage}")
         result = subprocess.run([sys.executable, "-m", module, "--model", args.model])
         if result.returncode != 0:

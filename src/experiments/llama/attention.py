@@ -4,7 +4,7 @@ computes entropy and uniformity over the word-list span for P1/P2/P3 to test
 whether repeated tokens cause attention collapse.
 
 Usage:
-    uv run -m src.experiments.attention --model llama-1b
+    uv run -m src.experiments.llama.attention --model llama-1b
 """
 
 import argparse

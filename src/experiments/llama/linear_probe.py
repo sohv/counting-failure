@@ -4,7 +4,7 @@ the correct count is linearly decodable, with leave-one-out cross-validation.
 Separate probes for repeated vs unique token conditions.
 
 Usage:
-    uv run -m src.experiments.linear_probe --model llama-1b
+    uv run -m src.experiments.llama.linear_probe --model llama-1b
 """
 
 import argparse

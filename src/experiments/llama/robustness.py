@@ -4,7 +4,7 @@ bfloat16) and across three seeds. Reports whether the identified writer layer
 and depth band are stable across numerical environments.
 
 Usage:
-    uv run -m src.experiments.robustness --model llama-1b
+    uv run -m src.experiments.llama.robustness --model llama-1b
 """
 
 import argparse
