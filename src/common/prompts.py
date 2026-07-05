@@ -60,6 +60,58 @@ PROMPTS_FIXED = {
     },
 }
 
+# interleaved-noise variants (phase1_baseline only): structural delimiters that
+# break the space-separated format without changing the target count, each in
+# a delimiter-only form and a form with a matching "-separated list" hint, to
+# isolate the tokenization/format shift from the effect of the instruction
+# wording itself (PROMPTS_FIXED's comma prompt bundles both together).
+PROMPTS_INTERLEAVED = {
+    "newline_no_hint": {
+        "text": (
+            'Count the number of times "apple" appears in this list: '
+            + " \n ".join(["apple"] * 10) + ". Respond only with the integer, nothing else."
+        ),
+        "expected": 10,
+        "delimiter": "\n",
+        "description": "10 identical tokens, newline-separated, no instruction hint",
+    },
+    "newline_hint": {
+        "text": (
+            'Count the number of times "apple" appears in this newline-separated list: '
+            + " \n ".join(["apple"] * 10) + ". Respond only with the integer, nothing else."
+        ),
+        "expected": 10,
+        "delimiter": "\n",
+        "description": "10 identical tokens, newline-separated, with instruction hint",
+    },
+    "pipe_no_hint": {
+        "text": (
+            'Count the number of times "apple" appears in this list: '
+            + " | ".join(["apple"] * 10) + ". Respond only with the integer, nothing else."
+        ),
+        "expected": 10,
+        "delimiter": "|",
+        "description": "10 identical tokens, pipe-separated, no instruction hint",
+    },
+    "pipe_hint": {
+        "text": (
+            'Count the number of times "apple" appears in this pipe-separated list: '
+            + " | ".join(["apple"] * 10) + ". Respond only with the integer, nothing else."
+        ),
+        "expected": 10,
+        "delimiter": "|",
+        "description": "10 identical tokens, pipe-separated, with instruction hint",
+    },
+}
+
+# full variant set for the interleaved-noise experiment: space/comma baselines
+# plus the 4 interleaved conditions, all phase1_baseline (n=10, repeated tokens)
+INTERLEAVED_VARIANTS = {
+    "space_baseline": PROMPTS["phase1_baseline"],
+    "comma": PROMPTS_FIXED["phase1_baseline"],
+    **PROMPTS_INTERLEAVED,
+}
+
 PARAPHRASES = {
     "original": (
         'Count the number of times "apple" appears in this list: '

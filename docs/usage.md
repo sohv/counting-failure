@@ -18,17 +18,21 @@ Qwen models have no pre-set critical layers — `mechanistic.py` auto-discovers 
 
 ```
 src/experiments/
-├── behavioral.py       ← all 5 models
-├── llama/              ← Llama-specific mechanistic pipeline
+├── behavioral.py         ← all 5 models
+├── interleaved_noise.py  ← llama-1b, llama-3b, qwen-1.5b only (prior-active models)
+├── llama/                ← Llama-specific mechanistic pipeline
 │   ├── attention.py
 │   ├── linear_probe.py
 │   ├── logit_lens.py
 │   ├── causal.py
 │   ├── robustness.py
+│   ├── interleaved_probe.py  ← probe + decomposition for the interleaved-noise variants
 │   └── run_all.py
-└── qwen/               ← Qwen-specific mechanistic pipeline
+└── qwen/                 ← Qwen-specific mechanistic pipeline
     ├── mechanistic.py
-    └── diagnostics.py
+    ├── diagnostics.py
+    ├── robustness.py         ← qwen-1.5b only (only Qwen model with a counting-writer)
+    └── interleaved_probe.py  ← qwen-1.5b only, same role as the Llama version
 ```
 
 ---
@@ -46,6 +50,33 @@ uv run -m src.experiments.behavioral --model qwen-7b
 ```
 
 Output: `results/<model>/behavioral.json`
+
+---
+
+## Extended n-sweep (qwen-3b, qwen-7b — used to characterize length-onset degradation)
+
+Fills in n = 13, 14, 16-19 around `behavioral.py`'s n-sweep (5-12, 15, 20), purely to check whether a model's degradation past n=12 is a clean threshold or intermittent. Behavioral only, out of scope for any mechanistic follow-up. Depends on `behavioral.json`.
+
+```bash
+uv run -m src.experiments.n_sweep_extended --model qwen-3b
+uv run -m src.experiments.n_sweep_extended --model qwen-7b
+```
+
+Output: `results/<model>/n_sweep_extended.json`
+
+---
+
+## Interleaved noise (llama-1b, llama-3b, qwen-1.5b only)
+
+Tests whether newline/pipe delimiters (with and without a matching "-separated list" instruction hint) suppress the repeated-token counting prior on phase1_baseline, compared against the existing space and comma baselines. Scoped to the three prior-active models — on qwen-3b/7b the prior is benign, so this tests nothing. Depends on `behavioral.json`.
+
+```bash
+uv run -m src.experiments.interleaved_noise --model llama-1b
+uv run -m src.experiments.interleaved_noise --model llama-3b
+uv run -m src.experiments.interleaved_noise --model qwen-1.5b
+```
+
+Output: `results/<model>/interleaved_noise.json`, `results/<model>/interleaved_noise.png`
 
 ---
 
@@ -119,11 +150,23 @@ uv run -m src.experiments.llama.robustness --model llama-3b
 
 Output: `results/<model>/robustness.json`
 
+### interleaved_probe
+
+Count-probe generalization (fit on space-separated prompts, evaluated out-of-distribution on each interleaved-noise variant) and MLP/attention decomposition at the fixed lock-in layer (never re-detected per condition). Depends on `behavioral.json`, `logit_lens.json`, and `interleaved_noise.json`.
+
+```bash
+uv run -m src.experiments.llama.interleaved_probe --model llama-1b
+uv run -m src.experiments.llama.interleaved_probe --model llama-3b
+```
+
+Output: `results/<model>/interleaved_mechanistic.json`
+
 ### Llama stage dependencies
 
 ```
 behavioral.json ──┬──> logit_lens ──┬──> causal
-                  │                 └──> robustness
+                  │                 ├──> robustness
+                  │                 └──> interleaved_probe (also needs interleaved_noise.json)
                   └── (linear_probe and attention are independent)
 ```
 
@@ -170,11 +213,22 @@ uv run -m src.experiments.qwen.robustness --model qwen-1.5b
 
 Output: `results/<model>/robustness_qwen.json`
 
+### interleaved_probe
+
+Count-probe generalization and MLP/attention decomposition at the fixed writer layer (recomputed once via the persistence backward-scan, never re-detected per condition) for the interleaved-noise variants. "10" is multi-token for this tokenizer, so the graded logit-difference uses "1" (its leading digit) as the correct-answer proxy. 1.5B only — 3B/7B have no counting-writer to test. Depends on `behavioral.json`, `mechanistic_qwen.json`, and `interleaved_noise.json`.
+
+```bash
+uv run -m src.experiments.qwen.interleaved_probe --model qwen-1.5b
+```
+
+Output: `results/<model>/interleaved_mechanistic_qwen.json`
+
 ### Qwen stage dependencies
 
 ```
 behavioral.json ──> mechanistic ──> diagnostics
-                                └─> robustness (1.5B only)
+                                ├─> robustness (1.5B only)
+                                └─> interleaved_probe (1.5B only, also needs interleaved_noise.json)
 ```
 
 ---
