@@ -76,7 +76,11 @@ def run_logit_lens(cfg, tokenizer, model_eager, attractors: dict) -> dict:
         print(f"\n  {phase_key}  correct={correct}  model_output={attractors[phase_key]}")
         print(f"  {'Layer':>6}  {'logit_diff':>10}  {'top_digit':>10}  {'margin':>8}")
 
-        remove_all_hooks(model_eager)
+        # no hooks registered yet at this point in the pipeline, so no cleanup is
+        # needed here - calling remove_all_hooks() a second/third time (once per
+        # phase) strips a hook transformers registers internally to populate
+        # output_hidden_states, silently truncating every phase after the first
+        # to a single (embed-only) entry.
         lens = logit_lens_all_layers(tokenizer, model_eager, PROMPTS[phase_key]["text"], correct, wrong)
         lens_all[phase_key] = lens
         for r in lens:
@@ -209,23 +213,29 @@ def full_layer_sweep(
     return sweep
 
 
-def find_writer_layer(sweep: dict) -> int | None:
-    """Find the layer with the largest MLP contribution to the wrong logit_diff."""
-    best_layer = None
-    best_contrib = -float("inf")
-    for layer_idx, data in sweep.items():
-        mlp_contrib = data["writer"]["mlp_contribution"]
-        if mlp_contrib > best_contrib:
-            best_contrib = mlp_contrib
-            best_layer = int(layer_idx)
-    return best_layer
+def find_writer_layer(sweep: dict, wrong_answer: int | str) -> int | None:
+    """Find the earliest layer where the wrong digit becomes and remains the
+    top post-MLP digit through the last layer (a persistent lock-in).
+
+    Picking whichever single layer has the largest raw MLP contribution is
+    unreliable: early layers are volatile in the logit-lens basis and can spike
+    on tokens unrelated to the eventual answer, well before the model has
+    settled on any digit at all. Requiring persistence to the final layer
+    rules those transient swings out.
+    """
+    wrong_str = str(wrong_answer)
+    layers = sorted(sweep.keys())
+    for layer_idx in layers:
+        if all(sweep[l]["top_digit_post_mlp"] == wrong_str for l in layers if l >= layer_idx):
+            return layer_idx
+    return None
 
 
-def auto_discover_layers(cfg, sweep: dict) -> tuple[list[int], int, list[int]]:
+def auto_discover_layers(cfg, sweep: dict, wrong_answer: int | str) -> tuple[list[int], int, list[int]]:
     """For models with no pre-set critical layers, discover them from the sweep."""
-    writer = find_writer_layer(sweep)
+    writer = find_writer_layer(sweep, wrong_answer)
     if writer is None:
-        LOGGER.warning("Could not find writer layer, defaulting to last layer")
+        LOGGER.warning("Could not find a persistent lock-in layer, defaulting to last layer")
         writer = cfg.n_layers
 
     critical_start = max(1, writer - 3)
@@ -305,10 +315,10 @@ def main():
         lockin_layer = cfg.lockin_layer
         gap_layers = cfg.gap_layers
     else:
-        critical_layers, lockin_layer, gap_layers = auto_discover_layers(cfg, sweep)
+        critical_layers, lockin_layer, gap_layers = auto_discover_layers(cfg, sweep, wrong_p1)
 
-    writer_layer = find_writer_layer(sweep)
-    print(f"\nWriter layer (largest MLP contribution): L{writer_layer}")
+    writer_layer = find_writer_layer(sweep, wrong_p1)
+    print(f"\nWriter layer (persistent lock-in): L{writer_layer}")
 
     # D2: decomposition
     decomp = mlp_attn_decomposition(cfg, tokenizer, model_eager, attractors, critical_layers)

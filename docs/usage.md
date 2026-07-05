@@ -160,10 +160,21 @@ uv run -m src.experiments.qwen.diagnostics --model qwen-7b
 
 Output: `results/<model>/diagnostics_qwen.json`
 
+### robustness
+
+Re-runs the phase1_baseline logit lens in bfloat16 and float32 across 3 seeds and checks whether the auto-discovered writer layer is stable. Only meaningful for models with a counting-writer to find (1.5B — fails P1); 3B/7B solve P1 and the script exits after printing a skip message. Depends on `behavioral.json` and `mechanistic_qwen.json`.
+
+```bash
+uv run -m src.experiments.qwen.robustness --model qwen-1.5b
+```
+
+Output: `results/<model>/robustness_qwen.json`
+
 ### Qwen stage dependencies
 
 ```
 behavioral.json ──> mechanistic ──> diagnostics
+                                └─> robustness (1.5B only)
 ```
 
 ---

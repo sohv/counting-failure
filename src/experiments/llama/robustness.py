@@ -76,19 +76,22 @@ def run_decomposition_sweep(
             "diff_post_attn": round(diff_post_attn, 4),
             "diff_post_mlp": round(diff_post_mlp, 4),
             "writer": writer_info,
+            "top_digit_post_mlp": r.get("h_post_layer", {}).get("top_digit", "?"),
         }
     return sweep
 
 
-def find_writer_from_sweep(sweep: dict) -> int | None:
-    best_layer = None
-    best_contrib = -float("inf")
-    for layer_idx, data in sweep.items():
-        mlp_contrib = data["writer"]["mlp_contribution"]
-        if mlp_contrib > best_contrib:
-            best_contrib = mlp_contrib
-            best_layer = int(layer_idx)
-    return best_layer
+def find_writer_from_sweep(sweep: dict, wrong: int | str) -> int | None:
+    """Earliest layer where the wrong digit becomes and stays the top post-MLP
+    digit through the last layer. Matches find_writer_layer in logit_lens.py —
+    picking the single largest MLP contribution instead lands on early, volatile
+    layers with no persistent connection to the eventual answer."""
+    wrong_str = str(wrong)
+    layers = sorted(sweep.keys())
+    for layer_idx in layers:
+        if all(sweep[l]["top_digit_post_mlp"] == wrong_str for l in layers if l >= layer_idx):
+            return layer_idx
+    return None
 
 
 def run_single_condition(
@@ -102,7 +105,7 @@ def run_single_condition(
 
     lens = run_logit_lens_sweep(tokenizer, model_eager, prompt, n_layers, correct, wrong)
     decomp = run_decomposition_sweep(tokenizer, model_eager, prompt, n_layers, correct, wrong)
-    writer = find_writer_from_sweep(decomp)
+    writer = find_writer_from_sweep(decomp, wrong)
 
     # extract logit_diff trajectory
     trajectory = [r.get("logit_diff", float("nan")) for r in lens]
