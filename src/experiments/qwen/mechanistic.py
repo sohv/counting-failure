@@ -18,6 +18,7 @@ from src.common.config import add_model_arg, get_config, load_results, output_pa
 from src.common.prompts import PARAPHRASES, PROMPTS
 from src.common.utils import decompose_layer as decompose_layer_with_diff
 from src.common.utils import get_writer_logit_diff, single_token_digit_proxy
+from src.common.utils import logit_lens_single as logit_lens_single_diff
 
 LOGGER = logging.getLogger(__name__)
 
@@ -195,7 +196,7 @@ def logit_lens_single(h, tokenizer, model_eager) -> tuple[str, list]:
     return get_top_digit(logits, tokenizer), [tokenizer.decode([i]) for i in logits.topk(5).indices]
 
 
-def run_logit_lens(cfg, tokenizer, model_eager) -> tuple[dict, list[int] | None]:
+def run_logit_lens(cfg, tokenizer, model_eager, all_results: dict) -> tuple[dict, list[int] | None]:
     n_layers = model_eager.config.num_hidden_layers
     print(f"\n{'='*70}")
     print(f"LOGIT LENS — {cfg.model_name}  ({n_layers} layers)")
@@ -204,8 +205,18 @@ def run_logit_lens(cfg, tokenizer, model_eager) -> tuple[dict, list[int] | None]
     lens_results = {}
     for phase_key in ["phase1_baseline", "phase3_control"]:
         correct = PROMPTS[phase_key]["expected"]
-        print(f"\n[{phase_key}]  correct={correct}")
-        print(f"  {'Layer':>6}  {'Top digit':>10}  Top-5 tokens")
+        # wrong-answer contrast digit for logit_diff, same fallback convention as
+        # run_mlp_decomposition: use the model's own seed-0 prediction, or correct-1
+        # if it happened to get this phase right.
+        wrong = all_results[phase_key][0]["predicted"]
+        if wrong is None or wrong == correct:
+            wrong = correct - 1
+        # qwen splits "10" into ["1","0"], so logit_diff needs single-token proxies
+        correct_proxy = single_token_digit_proxy(tokenizer, correct)
+        wrong_proxy = single_token_digit_proxy(tokenizer, wrong)
+
+        print(f"\n[{phase_key}]  correct={correct}  wrong={wrong}  (proxy correct={correct_proxy} wrong={wrong_proxy})")
+        print(f"  {'Layer':>6}  {'logit_diff':>10}  {'Top digit':>10}  Top-5 tokens")
         print("  " + "-" * 55)
         inputs = make_inputs_eager(PROMPTS[phase_key]["text"], tokenizer, model_eager)
         with torch.no_grad():
@@ -216,11 +227,15 @@ def run_logit_lens(cfg, tokenizer, model_eager) -> tuple[dict, list[int] | None]
             )
         lens = []
         for idx, h in enumerate(out.hidden_states):
-            td, top5 = logit_lens_single(h[0, -1, :], tokenizer, model_eager)
+            r = logit_lens_single_diff(
+                tokenizer, model_eager, h[0, -1, :],
+                correct_answer=correct_proxy, wrong_answer=wrong_proxy,
+            )
             entry = {"layer": "embed" if idx == 0 else f"L{idx:02d}",
-                     "top_digit": td, "top5": top5}
+                     "top_digit": r["top_digit"], "top5": r["top5"], "logit_diff": r["logit_diff"]}
             lens.append(entry)
-            print(f"  {entry['layer']:>6}  {td:>10}  {top5}")
+            ld_str = f"{entry['logit_diff']:.4f}" if isinstance(entry["logit_diff"], float) else str(entry["logit_diff"])
+            print(f"  {entry['layer']:>6}  {ld_str:>10}  {entry['top_digit']:>10}  {entry['top5']}")
         lens_results[phase_key] = lens
 
     # auto-discover writer: scan P1 lens from top down, find layer where digit first
@@ -689,7 +704,7 @@ def main():
 
     attn_summary  = run_attention_analysis(tokenizer, model_eager)
     probe_results = run_linear_probes(tokenizer, model_eager)
-    lens_results, auto_critical = run_logit_lens(cfg, tokenizer, model_eager)
+    lens_results, auto_critical = run_logit_lens(cfg, tokenizer, model_eager, all_results)
 
     # prefer config-set layers; fall back to auto-discovered
     critical_layers = cfg.critical_layers if cfg.critical_layers is not None else auto_critical
