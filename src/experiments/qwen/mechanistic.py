@@ -493,6 +493,169 @@ def run_anomaly_variation(cfg, pipe, tokenizer) -> dict:
     }
 
 
+# ── Anomaly robustness follow-ups ──────────────────────────────────────────
+
+LENGTH_SCALING_NS = [15, 20]
+
+
+def run_length_scaling_sweep(cfg, pipe, tokenizer) -> dict:
+    """Extends the base-length sweep past n=12 (banana intruder fixed) to test
+    whether the tail-position detection bias is a fixed-window recency effect
+    (hits stay at the same absolute positions) or scales proportionally with
+    sequence length (hits track the last ~20-30% of the list)."""
+    print(f"\nLength-scaling sweep (banana intruder) — {cfg.model_name}")
+    results = {n: run_anomaly_sweep(cfg, pipe, tokenizer, intruder_token="banana", base_n=n)
+               for n in LENGTH_SCALING_NS}
+
+    print(f"\nTail-position summary — {cfg.model_name}")
+    for n, r in results.items():
+        hits = [pos for pos, v in r["position_results"].items() if v["detected"]]
+        print(f"  n={n:<4}  hit_positions={hits}  last_position={n - 1}")
+
+    return {str(k): v for k, v in results.items()}
+
+
+TOKEN_PANEL = ["banana", "orange", "car", "chair", "the", "and", "xyz", "qzx", "seven", "five"]
+
+
+def run_token_panel_sweep(cfg, pipe, tokenizer, existing_results: dict | None = None) -> dict:
+    """Runs the full position+quantity sweep (base_n=10) across a diverse panel
+    of intruder tokens (food/object/function-word/nonsense/digit-word) to test
+    whether detection is token-specific or a generic not-apple signal. Reuses
+    tokens already computed by run_anomaly_variation instead of re-running them."""
+    existing_results = existing_results or {}
+    valid_tokens = [t for t in TOKEN_PANEL if is_single_token(tokenizer, t)]
+    skipped = [t for t in TOKEN_PANEL if t not in valid_tokens]
+    if skipped:
+        LOGGER.warning(f"Skipping panel tokens not single-token for {cfg.model_name}: {skipped}")
+
+    new_tokens = [t for t in valid_tokens if t not in existing_results]
+    print(f"\nToken panel sweep, base_n=10 — {cfg.model_name}")
+    print(f"Panel tokens: {valid_tokens}  "
+          f"(reusing {len(valid_tokens) - len(new_tokens)} from the variation sweep, running {len(new_tokens)} new)")
+
+    panel_results = {t: existing_results[t] for t in valid_tokens if t in existing_results}
+    panel_results.update({t: run_anomaly_sweep(cfg, pipe, tokenizer, intruder_token=t, base_n=10) for t in new_tokens})
+
+    thresholds = {t: panel_results[t]["detection_threshold"] for t in valid_tokens}
+    position_signatures = {
+        t: tuple(sorted(int(pos) for pos, v in panel_results[t]["position_results"].items() if v["detected"]))
+        for t in valid_tokens
+    }
+    distinct_signatures = set(position_signatures.values())
+
+    print(f"\nThreshold + position-signature summary — {cfg.model_name}")
+    for t in valid_tokens:
+        print(f"  {t:<10}  threshold={thresholds[t]}  hit_positions={position_signatures[t]}")
+    print(f"  distinct position-hit signatures: {len(distinct_signatures)} across {len(valid_tokens)} tokens")
+
+    return {
+        "panel_results": panel_results,
+        "thresholds_by_token": thresholds,
+        "position_signatures": {t: list(sig) for t, sig in position_signatures.items()},
+        "n_distinct_signatures": len(distinct_signatures),
+    }
+
+
+# ── Category attention probe (grounds the token-panel category split) ──────
+# 3B splits the token panel cleanly by category: function/digit-words (the,
+# and, seven, five) are detected almost immediately, nouns/nonsense (banana,
+# orange, car, chair, xyz) need most of the list replaced. This probe tests
+# whether that split shows up as a difference in how much the last token
+# attends to the intruder, at a single fixed condition (intruder at word
+# index 4, n=10) so every token is compared under identical conditions.
+
+EASY_CATEGORY = ["the", "and", "seven", "five"]
+HARD_CATEGORY = ["banana", "orange", "car", "chair", "xyz"]
+
+
+def find_intruder_position(tokens: list[str], intruder_token: str) -> int | None:
+    """Locate the intruder's position within the word-list span (after the last
+    colon, up to the closing period) — restricted to that span so a word like
+    "the" that also appears in the instruction text isn't matched there instead."""
+    colon_idx = None
+    for i, t in enumerate(tokens):
+        if t.strip() == ":":
+            colon_idx = i
+    if colon_idx is None:
+        return None
+
+    valid = {"apple", intruder_token}
+    positions = []
+    for i in range(colon_idx + 1, len(tokens)):
+        if tokens[i].strip() in valid:
+            positions.append(i)
+        elif "." in tokens[i] and positions:
+            break
+    return positions[4] if len(positions) > 4 else None
+
+
+def run_category_attention_probe(cfg, tokenizer, model_eager) -> dict:
+    print(f"\nCategory attention probe (intruder at word index 4, n=10) — {cfg.model_name}")
+
+    results = {}
+    for token in TOKEN_PANEL:
+        if not is_single_token(tokenizer, token):
+            LOGGER.warning(f"Skipping {token!r} - not single-token for {cfg.model_name}")
+            continue
+
+        words = ["apple"] * 10
+        words[4] = token
+        prompt = (
+            'Count the number of times "apple" appears in this list: '
+            + " ".join(words)
+            + ". Respond only with the integer, nothing else."
+        )
+        inputs = make_inputs_eager(prompt, tokenizer, model_eager)
+        input_ids = inputs["input_ids"][0]
+        tokens_decoded = [tokenizer.decode([t]) for t in input_ids]
+
+        intruder_pos = find_intruder_position(tokens_decoded, token)
+        if intruder_pos is None:
+            LOGGER.warning(f"Could not locate {token!r} in the word-list span for {cfg.model_name}")
+            continue
+
+        with torch.no_grad():
+            out = model_eager(
+                input_ids=inputs["input_ids"],
+                attention_mask=inputs["attention_mask"],
+                output_attentions=True,
+            )
+        attentions = torch.stack(out.attentions).squeeze(1).cpu().float()  # (layers, heads, seq, seq)
+        attn_to_intruder = attentions[:, :, -1, intruder_pos]  # (layers, heads), from last token
+
+        mean_per_layer = attn_to_intruder.mean(dim=1)
+        overall_mean = float(attn_to_intruder.mean())
+        overall_max = float(attn_to_intruder.max())
+        peak_layer = int(mean_per_layer.argmax().item())
+
+        print(f"  {token:<8}  overall_mean_attn={overall_mean:.4f}  overall_max_attn={overall_max:.4f}  peak_layer=L{peak_layer}")
+
+        results[token] = {
+            "intruder_pos": intruder_pos,
+            "mean_attn_per_layer": [round(x, 4) for x in mean_per_layer.tolist()],
+            "overall_mean_attn": round(overall_mean, 4),
+            "overall_max_attn": round(overall_max, 4),
+            "peak_layer": peak_layer,
+        }
+
+    easy_means = [results[t]["overall_mean_attn"] for t in EASY_CATEGORY if t in results]
+    hard_means = [results[t]["overall_mean_attn"] for t in HARD_CATEGORY if t in results]
+    easy_avg = round(sum(easy_means) / len(easy_means), 4) if easy_means else None
+    hard_avg = round(sum(hard_means) / len(hard_means), 4) if hard_means else None
+
+    print(f"\n  easy category (function/digit-words) avg attn: {easy_avg}")
+    print(f"  hard category (nouns/nonsense) avg attn:        {hard_avg}")
+
+    return {
+        "per_token": results,
+        "easy_category": EASY_CATEGORY,
+        "hard_category": HARD_CATEGORY,
+        "easy_avg_attn": easy_avg,
+        "hard_avg_attn": hard_avg,
+    }
+
+
 # ── Main ──────────────────────────────────────────────────────────────────
 
 def main():
@@ -583,6 +746,24 @@ def main():
         with open(anomaly_path, "w") as f:
             json.dump(anomaly, f, indent=2)
         print(f"Saved: {anomaly_path}")
+
+        length_scaling = run_length_scaling_sweep(cfg, pipe, tokenizer)
+        token_panel = run_token_panel_sweep(cfg, pipe, tokenizer, existing_results=anomaly["token_variation"])
+        robustness = {"length_scaling": length_scaling, "token_panel": token_panel}
+        output["anomaly_robustness"] = robustness
+        robustness_path = output_path(cfg, "anomaly_robustness_qwen.json")
+        with open(robustness_path, "w") as f:
+            json.dump(robustness, f, indent=2)
+        print(f"Saved: {robustness_path}")
+
+        # grounds the token-panel category split (function/digit-words vs nouns/nonsense)
+        # in attention, using the eager model already loaded above
+        category_attention = run_category_attention_probe(cfg, tokenizer, model_eager)
+        output["category_attention"] = category_attention
+        category_path = output_path(cfg, "category_attention_qwen.json")
+        with open(category_path, "w") as f:
+            json.dump(category_attention, f, indent=2)
+        print(f"Saved: {category_path}")
 
     save_path = output_path(cfg, "mechanistic_qwen.json")
     with open(save_path, "w") as f:

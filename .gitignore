@@ -19,3 +19,4 @@ results/
 wandb/
 *.log
 *.ipynb
+research_log.md
