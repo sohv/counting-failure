@@ -1,4 +1,4 @@
-# mean-ablation and targeted (p3->p1) patching at the qwen counting-writer sites, individually and jointly.
+# zero/mean-ablation and targeted (p3->p1) patching at the qwen counting-writer sites, individually and jointly.
 # uv run -m src.experiments.qwen.causal --model qwen-1.5b
 
 import argparse
@@ -18,6 +18,7 @@ from src.common.utils import (
     mean_ablate_mlp,
     remove_all_hooks,
     single_token_digit_proxy,
+    zero_ablate_mlp,
 )
 
 LOGGER = logging.getLogger(__name__)
@@ -30,6 +31,33 @@ def _get_pre_logit_diff(tokenizer, model_eager, prompt: str, correct: int, wrong
         out = model_eager(**inputs)
     logits = out.logits[0, -1, :]
     return logit_difference(tokenizer, logits, correct, wrong), get_top_digit(tokenizer, logits)
+
+
+def run_zero_ablation_sites(tokenizer, model_eager, sites: list[int], wrong: int) -> dict:
+    """Mirrors llama.causal's E1 (zero-ablation), generalized to individual +
+    joint sites, closing the coverage gap with the Llama causal tables."""
+    print(f"\nZero-ablation, individual + joint, sites={sites}")
+
+    results = {}
+    for n in [8, 9, 10, 11, 12, 15]:
+        correct = single_token_digit_proxy(tokenizer, n)
+        target_prompt = make_prompt_repeated(n)
+        pre_diff, _ = _get_pre_logit_diff(tokenizer, model_eager, target_prompt, correct, wrong)
+
+        per_n = {"n": n, "correct": n, "correct_proxy": correct, "wrong": wrong, "pre_logit_diff": pre_diff}
+        for site in sites:
+            post = zero_ablate_mlp(tokenizer, model_eager, target_prompt, [site], correct, wrong)
+            per_n[f"L{site:02d}"] = {**post, "movement": round(pre_diff - post["logit_diff"], 4)}
+        if len(sites) > 1:
+            post = zero_ablate_mlp(tokenizer, model_eager, target_prompt, sites, correct, wrong)
+            per_n["joint"] = {**post, "movement": round(pre_diff - post["logit_diff"], 4)}
+
+        site_str = "  ".join(f"L{s:02d}={per_n[f'L{s:02d}']['logit_diff']:.4f}" for s in sites)
+        joint_str = f"  joint={per_n['joint']['logit_diff']:.4f}" if len(sites) > 1 else ""
+        print(f"  n={n:<3}  correct_proxy={correct}  pre={pre_diff:>8.4f}  {site_str}{joint_str}")
+
+        results[n] = per_n
+    return results
 
 
 def run_mean_ablation_sites(tokenizer, model_eager, sites: list[int], wrong: int) -> dict:
@@ -113,6 +141,7 @@ def main():
 
     tokenizer, model_eager = load_eager_model(cfg.model_name)
 
+    zero_ablation_sites = run_zero_ablation_sites(tokenizer, model_eager, sites, wrong)
     mean_ablation_sites = run_mean_ablation_sites(tokenizer, model_eager, sites, wrong)
     patch_sites = run_patch_sites(tokenizer, model_eager, sites, wrong)
 
@@ -120,6 +149,7 @@ def main():
         "model": cfg.model_name,
         "wrong_answer": wrong,
         "ablation_sites": sites,
+        "zero_ablation_sites": {str(k): v for k, v in zero_ablation_sites.items()},
         "mean_ablation_sites": {str(k): v for k, v in mean_ablation_sites.items()},
         "patch_sites": {str(k): v for k, v in patch_sites.items()},
     }

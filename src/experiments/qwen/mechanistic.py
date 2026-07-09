@@ -515,7 +515,7 @@ def run_length_scaling_sweep(cfg, pipe, tokenizer) -> dict:
     return {str(k): v for k, v in results.items()}
 
 
-TOKEN_PANEL = ["banana", "orange", "car", "chair", "the", "and", "xyz", "qzx", "seven", "five"]
+TOKEN_PANEL = ["banana", "orange", "car", "chair", "the", "and", "xyz", "qzx", "seven", "five", "three", "nine"]
 
 
 def run_token_panel_sweep(cfg, pipe, tokenizer, existing_results: dict | None = None) -> dict:
@@ -565,7 +565,7 @@ def run_token_panel_sweep(cfg, pipe, tokenizer, existing_results: dict | None = 
 # attends to the intruder, at a single fixed condition (intruder at word
 # index 4, n=10) so every token is compared under identical conditions.
 
-EASY_CATEGORY = ["the", "and", "seven", "five"]
+EASY_CATEGORY = ["the", "and", "seven", "five", "three", "nine"]
 HARD_CATEGORY = ["banana", "orange", "car", "chair", "xyz"]
 
 
