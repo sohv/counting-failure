@@ -1,9 +1,5 @@
-# Diagnostics for Qwen models: probe dissociation, tokenizer limitation, direct logit check.
-# Reads probe_results_qwen.json and logit_lens_qwen.json from mechanistic.py.
-# Probe dissociation only runs when the model fails P1 (has a real wrong attractor).
+# diagnostics for qwen models: probe dissociation, tokenizer limitation, direct logit check.
 # uv run -m src.experiments.qwen.diagnostics --model qwen-1.5b
-# uv run -m src.experiments.qwen.diagnostics --model qwen-3b
-# uv run -m src.experiments.qwen.diagnostics --model qwen-7b
 
 import argparse
 import json

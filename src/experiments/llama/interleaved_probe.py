@@ -1,17 +1,5 @@
-"""
-For each interleaved-noise variant (space/comma baselines, newline/pipe x
-hint/no-hint), tests whether the count probe fit on ordinary space-separated
-prompts (n=3..15) still decodes n=10 from the variant's hidden state
-(generalization, not cross-validation - the variant is out-of-distribution
-for the probe), and runs MLP/attention decomposition at the fixed lock-in
-layer (never re-detected per condition, since find_writer_layer on a new
-condition risks tripping on the same early-layer noise fixed elsewhere).
-Depends on behavioral.json and logit_lens.json.
-
-Usage:
-    uv run -m src.experiments.llama.interleaved_probe --model llama-1b
-    uv run -m src.experiments.llama.interleaved_probe --model llama-3b
-"""
+# tests whether the count probe and mlp/attention decomposition generalize to interleaved-noise variants.
+# uv run -m src.experiments.llama.interleaved_probe --model llama-1b
 
 import argparse
 import json

@@ -1,11 +1,5 @@
-"""
-Three-phase counting (identical / anomaly / unique tokens), sequence-length
-sweep, tokenization guards, delimiter comparison, paraphrase robustness,
-language robustness, repeated symbols, and chain-of-thought probes.
-
-Usage:
-    uv run -m src.experiments.behavioral --model llama-1b
-"""
+# three-phase counting, sequence-length sweep, paraphrase/language/symbol robustness, and chain-of-thought probes.
+# uv run -m src.experiments.behavioral --model llama-1b
 
 import argparse
 import json
@@ -310,14 +304,37 @@ def language_robustness(pipe, tokenizer, known_attractor: str) -> dict:
 def repeated_symbols(pipe, tokenizer, known_attractor: str) -> dict:
     print("\nRepeated symbols")
     symbols = ["apple", "1", "0", "7", "cat", "the", "a", "X"]
+    digit_fallbacks = ["2", "3", "4", "5", "6", "8", "9"]
+    word_fallbacks = ["dog", "she", "an", "Y"]
+
     results = {}
     for symbol in symbols:
-        prompt = make_prompt_repeated(10, word=symbol)
+        actual_symbol = symbol
+        substitution = None
+        if len(tokenizer.encode(symbol, add_special_tokens=False)) != 1:
+            fallback_pool = digit_fallbacks if symbol.isdigit() else word_fallbacks
+            for fallback in fallback_pool:
+                if fallback in symbols:
+                    continue
+                if len(tokenizer.encode(fallback, add_special_tokens=False)) == 1:
+                    substitution = {"original": symbol, "substituted": fallback, "reason": "not single-token"}
+                    actual_symbol = fallback
+                    LOGGER.warning(f"Symbol {symbol!r} is not single-token, substituting {fallback!r}")
+                    break
+            if substitution is None:
+                raise ValueError(f"No single-token fallback found for symbol {symbol!r}")
+
+        prompt = make_prompt_repeated(10, word=actual_symbol)
         raw = generate(pipe, tokenizer, prompt, max_new_tokens=8)
         predicted = extract_count(raw)
         prior_fires = str(predicted) == known_attractor
-        print(f"  {repr(symbol):<10}  output={str(predicted):>4}  prior_fires={'yes' if prior_fires else 'no'}")
-        results[symbol] = {"predicted": predicted, "correct": predicted == 10, "prior_fires": prior_fires}
+        sub_note = f"  (substituted for {symbol!r})" if substitution else ""
+        print(f"  {repr(actual_symbol):<10}  output={str(predicted):>4}  prior_fires={'yes' if prior_fires else 'no'}{sub_note}")
+        results[symbol] = {
+            "tested_symbol": actual_symbol, "predicted": predicted,
+            "correct": predicted == 10, "prior_fires": prior_fires,
+            "substitution": substitution,
+        }
     return results
 
 

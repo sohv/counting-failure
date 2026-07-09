@@ -1,11 +1,5 @@
-"""
-Re-runs logit lens and decomposition in float32 (in addition to default
-bfloat16) and across three seeds. Reports whether the identified writer layer
-and depth band are stable across numerical environments.
-
-Usage:
-    uv run -m src.experiments.llama.robustness --model llama-1b
-"""
+# re-runs logit lens and decomposition in float32 and across three seeds to test writer-layer stability.
+# uv run -m src.experiments.llama.robustness --model llama-1b
 
 import argparse
 import json

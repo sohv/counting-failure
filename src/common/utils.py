@@ -144,6 +144,17 @@ def make_inputs_eager(tokenizer, model_eager, prompt_text: str):
 
 # -- Digit logit extraction --------------------------------------------------
 
+def single_token_digit_proxy(tokenizer, n: int) -> int:
+    """Return n if str(n) is single-token for this tokenizer, else the integer
+    value of its leading-digit token (e.g. Qwen splits "10" into ["1", "0"],
+    so callers that need a single-token correct/wrong answer for logit_diff
+    should use this instead of the raw multi-digit number)."""
+    ids = tokenizer.encode(str(n), add_special_tokens=False)
+    if len(ids) == 1:
+        return n
+    return int(tokenizer.decode([ids[0]]))
+
+
 def _digit_candidates(tokenizer, logits_1d, max_digit: int = 20) -> dict:
     candidates = {}
     for n in range(1, max_digit):
@@ -301,6 +312,156 @@ def get_writer_argmax(before: str, post_attn: str, post_mlp: str, target: str) -
         return "(stable)"
     else:
         return "-"
+
+
+# -- Ablation and patching (multi-layer) -------------------------------------
+# Each takes a list of 1-indexed layer numbers so a single site reproduces the
+# original single-layer behavior; a multi-site list ablates/patches all of
+# them simultaneously (joint intervention).
+
+def zero_ablate_mlp(
+    tokenizer, model_eager, prompt: str, layer_indices: list[int],
+    correct: int, wrong: int,
+) -> dict:
+    remove_all_hooks(model_eager)
+
+    def zero_hook(module, input, output):
+        return torch.zeros_like(output)
+
+    handles = [model_eager.model.layers[i - 1].mlp.register_forward_hook(zero_hook) for i in layer_indices]
+    inputs = make_inputs_eager(tokenizer, model_eager, prompt)
+    with torch.no_grad():
+        out = model_eager(**inputs)
+    for h in handles:
+        h.remove()
+
+    logits = out.logits[0, -1, :]
+    return {
+        "top_digit": get_top_digit(tokenizer, logits),
+        "logit_diff": logit_difference(tokenizer, logits, correct, wrong),
+        "top5": [tokenizer.decode([i]) for i in logits.topk(5).indices],
+    }
+
+
+def mean_ablate_mlp(
+    tokenizer, model_eager, target_prompt: str,
+    reference_prompts: list[str], layer_indices: list[int],
+    correct: int, wrong: int,
+) -> dict:
+    """Replace writer MLP output(s) with the mean MLP output from reference prompts."""
+    means = {}
+    for layer_idx in layer_indices:
+        outs = []
+        for ref_prompt in reference_prompts:
+            remove_all_hooks(model_eager)
+            cache = {}
+
+            def capture(module, input, output, _cache=cache):
+                _cache["out"] = output.detach().clone() if isinstance(output, torch.Tensor) else output[0].detach().clone()
+
+            handle = model_eager.model.layers[layer_idx - 1].mlp.register_forward_hook(capture)
+            with torch.no_grad():
+                model_eager(**make_inputs_eager(tokenizer, model_eager, ref_prompt))
+            handle.remove()
+            outs.append(cache["out"][0, -1, :] if cache["out"].dim() > 1 else cache["out"])
+        means[layer_idx] = torch.stack(outs).mean(dim=0)
+
+    remove_all_hooks(model_eager)
+
+    def make_replace_hook(mean_vec):
+        def replace_hook(module, input, output, _mean=mean_vec):
+            if isinstance(output, torch.Tensor):
+                patched = output.clone()
+                patched[0, -1, :] = _mean
+                return patched
+            else:
+                patched = output[0].clone()
+                patched[0, -1, :] = _mean
+                return (patched,) + output[1:]
+        return replace_hook
+
+    handles = [
+        model_eager.model.layers[layer_idx - 1].mlp.register_forward_hook(make_replace_hook(means[layer_idx]))
+        for layer_idx in layer_indices
+    ]
+    inputs = make_inputs_eager(tokenizer, model_eager, target_prompt)
+    with torch.no_grad():
+        out = model_eager(**inputs)
+    for h in handles:
+        h.remove()
+
+    logits = out.logits[0, -1, :]
+    return {
+        "top_digit": get_top_digit(tokenizer, logits),
+        "logit_diff": logit_difference(tokenizer, logits, correct, wrong),
+    }
+
+
+def denoising_patch_mlp(
+    tokenizer, model_eager, source_prompt: str, target_prompt: str,
+    layer_indices: list[int], correct: int, wrong: int, norm_match: bool = True,
+) -> dict:
+    """Inject source MLP output(s) into target forward pass, norm-matched per site."""
+    source_mlps = {}
+    for layer_idx in layer_indices:
+        remove_all_hooks(model_eager)
+        source_cache = {}
+
+        def capture_source(module, input, output, _cache=source_cache):
+            o = output if isinstance(output, torch.Tensor) else output[0]
+            _cache["out"] = o[0, -1, :].detach().clone()
+
+        handle = model_eager.model.layers[layer_idx - 1].mlp.register_forward_hook(capture_source)
+        with torch.no_grad():
+            model_eager(**make_inputs_eager(tokenizer, model_eager, source_prompt))
+        handle.remove()
+        source_mlp = source_cache["out"]
+
+        if norm_match:
+            remove_all_hooks(model_eager)
+            target_cache = {}
+
+            def capture_target(module, input, output, _cache=target_cache):
+                o = output if isinstance(output, torch.Tensor) else output[0]
+                _cache["out"] = o[0, -1, :].detach().clone()
+
+            handle = model_eager.model.layers[layer_idx - 1].mlp.register_forward_hook(capture_target)
+            with torch.no_grad():
+                model_eager(**make_inputs_eager(tokenizer, model_eager, target_prompt))
+            handle.remove()
+            target_norm = target_cache["out"].norm()
+            source_mlp = source_mlp * (target_norm / (source_mlp.norm() + 1e-8))
+
+        source_mlps[layer_idx] = source_mlp
+
+    remove_all_hooks(model_eager)
+
+    def make_inject_hook(src_vec):
+        def inject_hook(module, input, output, _src=src_vec):
+            if isinstance(output, torch.Tensor):
+                patched = output.clone()
+                patched[0, -1, :] = _src
+                return patched
+            else:
+                patched = output[0].clone()
+                patched[0, -1, :] = _src
+                return (patched,) + output[1:]
+        return inject_hook
+
+    handles = [
+        model_eager.model.layers[layer_idx - 1].mlp.register_forward_hook(make_inject_hook(source_mlps[layer_idx]))
+        for layer_idx in layer_indices
+    ]
+    with torch.no_grad():
+        out = model_eager(**make_inputs_eager(tokenizer, model_eager, target_prompt))
+    for h in handles:
+        h.remove()
+
+    logits = out.logits[0, -1, :]
+    return {
+        "top_digit": get_top_digit(tokenizer, logits),
+        "logit_diff": logit_difference(tokenizer, logits, correct, wrong),
+    }
 
 
 # -- Hidden state extraction -------------------------------------------------

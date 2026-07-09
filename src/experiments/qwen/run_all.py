@@ -1,5 +1,5 @@
-# runs every common and llama-specific experiment for one llama model, in order, each stage as a subprocess.
-# uv run -m src.experiments.llama.run_all --model llama-1b
+# runs every common and qwen-specific experiment for one qwen model, in order, each stage as a subprocess.
+# uv run -m src.experiments.qwen.run_all --model qwen-1.5b
 
 import argparse
 import subprocess
@@ -12,12 +12,11 @@ STAGES = {
     "n_sweep_extended": "src.experiments.n_sweep_extended",
     "token_generality": "src.experiments.token_generality",
     "interleaved_noise": "src.experiments.interleaved_noise",
-    "linear_probe": "src.experiments.llama.linear_probe",
-    "attention": "src.experiments.llama.attention",
-    "logit_lens": "src.experiments.llama.logit_lens",
-    "causal": "src.experiments.llama.causal",
-    "robustness": "src.experiments.llama.robustness",
-    "interleaved_probe": "src.experiments.llama.interleaved_probe",
+    "mechanistic": "src.experiments.qwen.mechanistic",
+    "diagnostics": "src.experiments.qwen.diagnostics",
+    "causal": "src.experiments.qwen.causal",
+    "robustness": "src.experiments.qwen.robustness",
+    "interleaved_probe": "src.experiments.qwen.interleaved_probe",
 }
 
 

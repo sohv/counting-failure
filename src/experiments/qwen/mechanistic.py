@@ -1,9 +1,5 @@
-# Mechanistic analysis for Qwen models: attention, linear probes, logit lens,
-# MLP decomposition (1.5B only — fails P1), anomaly sweep (3B/7B — passes P1).
-# Reads behavioral.json written by src.experiments.behavioral.
+# mechanistic analysis for qwen: attention, linear probes, logit lens, mlp decomposition, and anomaly sweep.
 # uv run -m src.experiments.qwen.mechanistic --model qwen-1.5b
-# uv run -m src.experiments.qwen.mechanistic --model qwen-3b
-# uv run -m src.experiments.qwen.mechanistic --model qwen-7b
 
 import argparse
 import json
@@ -19,7 +15,9 @@ from sklearn.preprocessing import StandardScaler
 from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
 
 from src.common.config import add_model_arg, get_config, load_results, output_path
-from src.common.prompts import PROMPTS
+from src.common.prompts import PARAPHRASES, PROMPTS
+from src.common.utils import decompose_layer as decompose_layer_with_diff
+from src.common.utils import get_writer_logit_diff, single_token_digit_proxy
 
 LOGGER = logging.getLogger(__name__)
 
@@ -351,11 +349,62 @@ def run_mlp_decomposition(cfg, tokenizer, model_eager,
     return decomp_results, pern_results
 
 
+def paraphrase_decomposition_qwen(
+    cfg, tokenizer, model_eager, sites: list[int],
+    correct_answer: int, wrong_answer: int,
+) -> dict:
+    """Decomposition at each writer site across paraphrased prompts, mirroring
+    llama.logit_lens.paraphrase_decomposition. Tests whether the same
+    input-state-matching account explains why no paraphrase bypasses the
+    prior in Qwen-1.5B (uses the shared decompose_layer, which computes
+    logit_diff; the local decompose_layer above only tracks top digit)."""
+    print(f"\nParaphrase decomposition at sites {sites}")
+
+    # qwen splits "10" into ["1","0"], so logit_diff needs a single-token proxy
+    correct_proxy = single_token_digit_proxy(tokenizer, correct_answer)
+    wrong_proxy = single_token_digit_proxy(tokenizer, wrong_answer)
+    print(f"  correct_proxy={correct_proxy}  wrong_proxy={wrong_proxy}")
+
+    results = {}
+    for pname, template in PARAPHRASES.items():
+        prompt = template.format(list=" ".join(["apple"] * 10))
+        results[pname] = {}
+        for site in sites:
+            remove_all_hooks(model_eager)
+            r = decompose_layer_with_diff(
+                tokenizer, model_eager, prompt, site,
+                correct_answer=correct_proxy, wrong_answer=wrong_proxy,
+            )
+            diff_before = r.get("h_before", {}).get("logit_diff", float("nan"))
+            diff_post_mlp = r.get("h_post_layer", {}).get("logit_diff", float("nan"))
+            writer_info = get_writer_logit_diff(
+                diff_before,
+                r.get("h_post_attn", {}).get("logit_diff", float("nan")),
+                diff_post_mlp,
+            )
+            print(f"  {pname:<15}  L{site:02d}  diff_before={diff_before:>8.4f}  diff_post_mlp={diff_post_mlp:>8.4f}"
+                  f"  mlp_contrib={writer_info['mlp_contribution']:>8.4f}")
+            results[pname][f"L{site:02d}"] = {
+                "diff_before": diff_before,
+                "diff_post_mlp": diff_post_mlp,
+                "writer": writer_info,
+            }
+    return results
+
+
 # ── Anomaly sweep (3B/7B path: model passes P1) ───────────────────────────
 
-def run_anomaly_sweep(cfg, pipe, tokenizer) -> dict:
+INTRUDER_TOKENS = ["banana", "car", "seven", "xyz"]
+BASE_NS = [8, 10, 12]
+
+
+def is_single_token(tokenizer, word: str) -> bool:
+    return len(tokenizer.encode(word, add_special_tokens=False)) == 1
+
+
+def run_anomaly_sweep(cfg, pipe, tokenizer, intruder_token: str = "banana", base_n: int = 10) -> dict:
     print(f"\n{'='*65}")
-    print(f"ANOMALY DETECTION SWEEP — {cfg.model_name}")
+    print(f"ANOMALY DETECTION SWEEP — {cfg.model_name}  intruder='{intruder_token}'  base_n={base_n}")
     print("=" * 65)
 
     def query(prompt: str) -> int | None:
@@ -367,43 +416,80 @@ def run_anomaly_sweep(cfg, pipe, tokenizer) -> dict:
         m = re.search(r'\b(\d+)\b', raw.strip())
         return int(m.group(1)) if m else None
 
-    print("\n[Test 1] Vary banana position (1 banana, 9 apples)")
+    print(f"\n[Test 1] Vary {intruder_token} position (1 intruder, {base_n - 1} apples)")
     print(f"  {'Position':>10}  {'Expected':>9}  {'Output':>8}  {'Detected?':>10}")
     pos_results = {}
-    for pos in range(10):
-        words = ["apple"] * 10
-        words[pos] = "banana"
+    for pos in range(base_n):
+        words = ["apple"] * base_n
+        words[pos] = intruder_token
         pred = query(
             'Count the number of times "apple" appears in this list: '
             + " ".join(words)
             + ". Respond only with the integer, nothing else."
         )
-        detected = pred == 9
-        print(f"  {pos:>10}  {9:>9}  {str(pred):>8}  {'YES ✓' if detected else 'NO ✗':>10}")
+        detected = pred == base_n - 1
+        print(f"  {pos:>10}  {base_n - 1:>9}  {str(pred):>8}  {'YES ✓' if detected else 'NO ✗':>10}")
         pos_results[pos] = {"predicted": pred, "detected": detected}
 
-    print("\n[Test 2] Vary number of bananas (positions 0..n-1)")
-    print(f"  {'N bananas':>10}  {'Expected':>9}  {'Output':>8}  {'Detected?':>10}")
+    max_intruders = min(5, base_n - 1)
+    print(f"\n[Test 2] Vary number of {intruder_token}s (positions 0..n-1)")
+    print(f"  {'N intruders':>12}  {'Expected':>9}  {'Output':>8}  {'Detected?':>10}")
     qty_results = {}
-    for n_bananas in range(1, 6):
-        words    = ["banana"] * n_bananas + ["apple"] * (10 - n_bananas)
-        expected = 10 - n_bananas
+    for n_intruders in range(1, max_intruders + 1):
+        words    = [intruder_token] * n_intruders + ["apple"] * (base_n - n_intruders)
+        expected = base_n - n_intruders
         pred     = query(
             'Count the number of times "apple" appears in this list: '
             + " ".join(words)
             + ". Respond only with the integer, nothing else."
         )
         detected = pred == expected
-        print(f"  {n_bananas:>10}  {expected:>9}  {str(pred):>8}  {'YES ✓' if detected else 'NO ✗':>10}")
-        qty_results[n_bananas] = {"expected": expected, "predicted": pred, "detected": detected}
+        print(f"  {n_intruders:>12}  {expected:>9}  {str(pred):>8}  {'YES ✓' if detected else 'NO ✗':>10}")
+        qty_results[n_intruders] = {"expected": expected, "predicted": pred, "detected": detected}
 
     threshold = next((k for k, v in qty_results.items() if v["detected"]), None)
-    print(f"\nDetection threshold: {threshold} banana(s) needed")
+    print(f"\nDetection threshold: {threshold} {intruder_token}(s) needed")
 
     return {
-        "position_results" : {str(k): v for k, v in pos_results.items()},
-        "quantity_results" : {str(k): v for k, v in qty_results.items()},
+        "intruder_token"    : intruder_token,
+        "base_n"            : base_n,
+        "position_results"  : {str(k): v for k, v in pos_results.items()},
+        "quantity_results"  : {str(k): v for k, v in qty_results.items()},
         "detection_threshold": threshold,
+    }
+
+
+def run_anomaly_variation(cfg, pipe, tokenizer) -> dict:
+    """Vary the intruder token (base_n fixed at 10) and the base length
+    (intruder fixed at 'banana') to test whether the detection threshold is a
+    property of the model or an artifact of the one token/length tested."""
+    valid_tokens = [t for t in INTRUDER_TOKENS if is_single_token(tokenizer, t)]
+    skipped = [t for t in INTRUDER_TOKENS if t not in valid_tokens]
+    if skipped:
+        LOGGER.warning(f"Skipping intruder tokens not single-token for {cfg.model_name}: {skipped}")
+    print(f"\nIntruder tokens used for variation sweep: {valid_tokens}")
+
+    token_variation = {t: run_anomaly_sweep(cfg, pipe, tokenizer, intruder_token=t, base_n=10) for t in valid_tokens}
+    length_variation = {n: run_anomaly_sweep(cfg, pipe, tokenizer, intruder_token="banana", base_n=n)
+                         for n in BASE_NS if n != 10}
+
+    thresholds_by_token = {t: r["detection_threshold"] for t, r in token_variation.items()}
+    thresholds_by_length = {str(n): r["detection_threshold"] for n, r in length_variation.items()}
+    thresholds_by_length["10"] = token_variation["banana"]["detection_threshold"]
+
+    print(f"\nThreshold summary — {cfg.model_name}")
+    print("  by intruder token (base_n=10)")
+    for t, thr in thresholds_by_token.items():
+        print(f"    {t:<10}  threshold={thr}")
+    print("  by base length (intruder=banana)")
+    for n, thr in sorted(thresholds_by_length.items(), key=lambda kv: int(kv[0])):
+        print(f"    n={n:<8}  threshold={thr}")
+
+    return {
+        "token_variation" : token_variation,
+        "length_variation": {str(k): v for k, v in length_variation.items()},
+        "thresholds_by_token" : thresholds_by_token,
+        "thresholds_by_length": thresholds_by_length,
     }
 
 
@@ -469,6 +555,21 @@ def main():
                 json.dump({"decomposition": decomp,
                            "per_n": {str(k): v for k, v in pern.items()}}, f, indent=2)
             print(f"Saved: {decomp_path}")
+
+        # lowest priority / conditional: paraphrase decomposition at writer sites
+        if cfg.writer_layers is not None:
+            wrong_answer = p1_attractor if p1_attractor != str(p1_correct) else str(p1_correct - 1)
+            paraphrase = paraphrase_decomposition_qwen(
+                cfg, tokenizer, model_eager, cfg.writer_layers,
+                p1_correct, int(wrong_answer),
+            )
+            output["paraphrase_decomposition"] = paraphrase
+            paraphrase_path = output_path(cfg, "paraphrase_decomp_qwen.json")
+            with open(paraphrase_path, "w") as f:
+                json.dump(paraphrase, f, indent=2)
+            print(f"Saved: {paraphrase_path}")
+        else:
+            LOGGER.warning("No writer_layers set for %s — skipping paraphrase decomposition.", cfg.key)
     else:
         # load generation model for anomaly sweep
         model_gen = AutoModelForCausalLM.from_pretrained(
@@ -476,7 +577,7 @@ def main():
         )
         pipe = pipeline("text-generation", model=model_gen,
                         tokenizer=tokenizer, device_map="auto")
-        anomaly = run_anomaly_sweep(cfg, pipe, tokenizer)
+        anomaly = run_anomaly_variation(cfg, pipe, tokenizer)
         output["anomaly_sweep"] = anomaly
         anomaly_path = output_path(cfg, "anomaly_sweep_qwen.json")
         with open(anomaly_path, "w") as f:

@@ -15,10 +15,18 @@ class ModelConfig:
     lockin_layer: int | None = None
     gap_layers: list[int] | None = None
     steer_layer: int | None = None
+    writer_layers: list[int] | None = None
 
     @property
     def short_name(self) -> str:
         return self.model_name.split("/")[-1]
+
+    @property
+    def ablation_sites(self) -> list[int]:
+        """Sites for the individual/joint mean-ablation and patching comparison."""
+        if self.writer_layers is not None:
+            return self.writer_layers
+        return [self.lockin_layer]
 
 
 MODEL_CONFIGS = {
@@ -39,11 +47,13 @@ MODEL_CONFIGS = {
         lockin_layer=26,
         gap_layers=[26, 23, 22],
         steer_layer=26,
+        writer_layers=[22, 26],
     ),
     "qwen-1.5b": ModelConfig(
         key="qwen-1.5b",
         model_name="Qwen/Qwen2.5-1.5B-Instruct",
         n_layers=28,
+        writer_layers=[22, 24],
     ),
     "qwen-3b": ModelConfig(
         key="qwen-3b",

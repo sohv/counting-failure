@@ -1,8 +1,4 @@
-# Re-runs the phase1_baseline logit lens in bfloat16 and float32 across 3 seeds
-# and checks whether the auto-discovered writer layer (persistence backward-scan,
-# same criterion as qwen.mechanistic.run_logit_lens) is stable. Only meaningful
-# for models with a counting-writer to find (model_fails_p1=True); 3B/7B solve
-# P1 and are skipped.
+# re-runs logit lens in bfloat16/float32 across three seeds to test writer-layer stability for qwen.
 # uv run -m src.experiments.qwen.robustness --model qwen-1.5b
 
 import argparse

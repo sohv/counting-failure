@@ -1,11 +1,5 @@
-"""
-Ridge regression probe per layer on last-token residual stream to test whether
-the correct count is linearly decodable, with leave-one-out cross-validation.
-Separate probes for repeated vs unique token conditions.
-
-Usage:
-    uv run -m src.experiments.llama.linear_probe --model llama-1b
-"""
+# ridge regression probe per layer to test whether the correct count is linearly decodable.
+# uv run -m src.experiments.llama.linear_probe --model llama-1b
 
 import argparse
 import json

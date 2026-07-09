@@ -1,15 +1,5 @@
-"""
-Every intervention scored by logit-difference movement (wrong-minus-correct),
-not by whether the top digit flips.
-
-E1: Zero-ablation of writer MLP.
-E2: Mean-ablation (replace writer MLP output with P3 mean at matched n).
-E3: Denoising patch (inject correct MLP output into failing case, norm-matched).
-Supplementary: full-residual patching sweep, steering vector.
-
-Usage:
-    uv run -m src.experiments.llama.causal --model llama-1b
-"""
+# zero/mean-ablation and denoising patch on the writer mlp, scored by logit-difference movement.
+# uv run -m src.experiments.llama.causal --model llama-1b
 
 import argparse
 import json
@@ -20,6 +10,7 @@ import torch
 from src.common.config import add_model_arg, get_config, load_results, output_path
 from src.common.prompts import PROMPTS, make_prompt_repeated, make_prompt_unique
 from src.common.utils import (
+    denoising_patch_mlp,
     extract_count,
     generate,
     get_top_digit,
@@ -27,7 +18,9 @@ from src.common.utils import (
     load_generation_model,
     logit_difference,
     make_inputs_eager,
+    mean_ablate_mlp,
     remove_all_hooks,
+    zero_ablate_mlp,
 )
 
 LOGGER = logging.getLogger(__name__)
@@ -45,29 +38,6 @@ def _get_pre_logit_diff(tokenizer, model_eager, prompt: str, correct: int, wrong
 
 # -- E1: Zero-ablation ------------------------------------------------------
 
-def zero_ablate_mlp(
-    tokenizer, model_eager, prompt: str, layer_idx: int,
-    correct: int, wrong: int,
-) -> dict:
-    remove_all_hooks(model_eager)
-
-    def zero_hook(module, input, output):
-        return torch.zeros_like(output)
-
-    handle = model_eager.model.layers[layer_idx - 1].mlp.register_forward_hook(zero_hook)
-    inputs = make_inputs_eager(tokenizer, model_eager, prompt)
-    with torch.no_grad():
-        out = model_eager(**inputs)
-    handle.remove()
-
-    logits = out.logits[0, -1, :]
-    return {
-        "top_digit": get_top_digit(tokenizer, logits),
-        "logit_diff": logit_difference(tokenizer, logits, correct, wrong),
-        "top5": [tokenizer.decode([i]) for i in logits.topk(5).indices],
-    }
-
-
 def run_zero_ablation(cfg, tokenizer, model_eager, lockin_layer: int, wrong: int) -> dict:
     print(f"\nE1: Zero-ablation of MLP at L{lockin_layer}")
     print(f"  {'n':>4}  {'pre_diff':>10}  {'post_diff':>10}  {'movement':>10}  {'pre_digit':>10}  {'post_digit':>11}")
@@ -76,7 +46,7 @@ def run_zero_ablation(cfg, tokenizer, model_eager, lockin_layer: int, wrong: int
     for n in [8, 9, 10, 11, 12, 15]:
         prompt = make_prompt_repeated(n)
         pre_diff, pre_digit = _get_pre_logit_diff(tokenizer, model_eager, prompt, n, wrong)
-        post = zero_ablate_mlp(tokenizer, model_eager, prompt, lockin_layer, n, wrong)
+        post = zero_ablate_mlp(tokenizer, model_eager, prompt, [lockin_layer], n, wrong)
         movement = round(pre_diff - post["logit_diff"], 4)
 
         print(f"  {n:>4}  {pre_diff:>10.4f}  {post['logit_diff']:>10.4f}  {movement:>10.4f}"
@@ -93,53 +63,6 @@ def run_zero_ablation(cfg, tokenizer, model_eager, lockin_layer: int, wrong: int
 
 # -- E2: Mean-ablation ------------------------------------------------------
 
-def mean_ablate_mlp(
-    tokenizer, model_eager, target_prompt: str,
-    reference_prompts: list[str], layer_idx: int,
-    correct: int, wrong: int,
-) -> dict:
-    """Replace writer MLP output with mean MLP output from reference prompts."""
-    mlp_outputs = []
-    for ref_prompt in reference_prompts:
-        remove_all_hooks(model_eager)
-        cache = {}
-
-        def capture(module, input, output, _cache=cache):
-            _cache["out"] = output.detach().clone() if isinstance(output, torch.Tensor) else output[0].detach().clone()
-
-        handle = model_eager.model.layers[layer_idx - 1].mlp.register_forward_hook(capture)
-        with torch.no_grad():
-            model_eager(**make_inputs_eager(tokenizer, model_eager, ref_prompt))
-        handle.remove()
-        mlp_outputs.append(cache["out"][0, -1, :] if cache["out"].dim() > 1 else cache["out"])
-
-    mean_mlp = torch.stack(mlp_outputs).mean(dim=0)
-
-    remove_all_hooks(model_eager)
-
-    def replace_hook(module, input, output, _mean=mean_mlp):
-        if isinstance(output, torch.Tensor):
-            patched = output.clone()
-            patched[0, -1, :] = _mean
-            return patched
-        else:
-            patched = output[0].clone()
-            patched[0, -1, :] = _mean
-            return (patched,) + output[1:]
-
-    handle = model_eager.model.layers[layer_idx - 1].mlp.register_forward_hook(replace_hook)
-    inputs = make_inputs_eager(tokenizer, model_eager, target_prompt)
-    with torch.no_grad():
-        out = model_eager(**inputs)
-    handle.remove()
-
-    logits = out.logits[0, -1, :]
-    return {
-        "top_digit": get_top_digit(tokenizer, logits),
-        "logit_diff": logit_difference(tokenizer, logits, correct, wrong),
-    }
-
-
 def run_mean_ablation(cfg, tokenizer, model_eager, lockin_layer: int, wrong: int) -> dict:
     print(f"\nE2: Mean-ablation of MLP at L{lockin_layer} (reference: P3 at matched n)")
     print(f"  {'n':>4}  {'pre_diff':>10}  {'post_diff':>10}  {'movement':>10}  {'post_digit':>11}")
@@ -150,7 +73,7 @@ def run_mean_ablation(cfg, tokenizer, model_eager, lockin_layer: int, wrong: int
         reference_prompts = [make_prompt_unique(n)]
 
         pre_diff, _ = _get_pre_logit_diff(tokenizer, model_eager, target_prompt, n, wrong)
-        post = mean_ablate_mlp(tokenizer, model_eager, target_prompt, reference_prompts, lockin_layer, n, wrong)
+        post = mean_ablate_mlp(tokenizer, model_eager, target_prompt, reference_prompts, [lockin_layer], n, wrong)
         movement = round(pre_diff - post["logit_diff"], 4)
 
         print(f"  {n:>4}  {pre_diff:>10.4f}  {post['logit_diff']:>10.4f}  {movement:>10.4f}  {post['top_digit']:>11}")
@@ -163,67 +86,63 @@ def run_mean_ablation(cfg, tokenizer, model_eager, lockin_layer: int, wrong: int
     return results
 
 
+# -- Individual + joint site comparison (mean-ablation and targeted patch) --
+# Generalizes E2/E3 Variant 1 to a list of writer sites: each site ablated or
+# patched alone, plus (when there is more than one site) all of them at once.
+# Tests whether single-site intervention is structurally sufficient in models
+# with more than one writer layer.
+
+def run_mean_ablation_sites(cfg, tokenizer, model_eager, sites: list[int], wrong: int) -> dict:
+    print(f"\nMean-ablation, individual + joint, sites={sites}")
+
+    results = {}
+    for n in [8, 9, 10, 11, 12, 15]:
+        target_prompt = make_prompt_repeated(n)
+        reference_prompts = [make_prompt_unique(n)]
+        pre_diff, _ = _get_pre_logit_diff(tokenizer, model_eager, target_prompt, n, wrong)
+
+        per_n = {"n": n, "correct": n, "wrong": wrong, "pre_logit_diff": pre_diff}
+        for site in sites:
+            post = mean_ablate_mlp(tokenizer, model_eager, target_prompt, reference_prompts, [site], n, wrong)
+            per_n[f"L{site:02d}"] = {**post, "movement": round(pre_diff - post["logit_diff"], 4)}
+        if len(sites) > 1:
+            post = mean_ablate_mlp(tokenizer, model_eager, target_prompt, reference_prompts, sites, n, wrong)
+            per_n["joint"] = {**post, "movement": round(pre_diff - post["logit_diff"], 4)}
+
+        site_str = "  ".join(f"L{s:02d}={per_n[f'L{s:02d}']['logit_diff']:.4f}" for s in sites)
+        joint_str = f"  joint={per_n['joint']['logit_diff']:.4f}" if len(sites) > 1 else ""
+        print(f"  n={n:<3}  pre={pre_diff:>8.4f}  {site_str}{joint_str}")
+
+        results[n] = per_n
+    return results
+
+
+def run_patch_sites(cfg, tokenizer, model_eager, sites: list[int], wrong: int) -> dict:
+    print(f"\nTargeted patch (P3->P1, matched n), individual + joint, sites={sites}")
+
+    results = {}
+    for n in [8, 9, 10, 11, 12, 15]:
+        target = make_prompt_repeated(n)
+        source = make_prompt_unique(n)
+        pre_diff, _ = _get_pre_logit_diff(tokenizer, model_eager, target, n, wrong)
+
+        per_n = {"n": n, "pre_logit_diff": pre_diff}
+        for site in sites:
+            post = denoising_patch_mlp(tokenizer, model_eager, source, target, [site], n, wrong)
+            per_n[f"L{site:02d}"] = {**post, "movement": round(pre_diff - post["logit_diff"], 4)}
+        if len(sites) > 1:
+            post = denoising_patch_mlp(tokenizer, model_eager, source, target, sites, n, wrong)
+            per_n["joint"] = {**post, "movement": round(pre_diff - post["logit_diff"], 4)}
+
+        site_str = "  ".join(f"L{s:02d}={per_n[f'L{s:02d}']['logit_diff']:.4f}" for s in sites)
+        joint_str = f"  joint={per_n['joint']['logit_diff']:.4f}" if len(sites) > 1 else ""
+        print(f"  n={n:<3}  pre={pre_diff:>8.4f}  {site_str}{joint_str}")
+
+        results[n] = per_n
+    return results
+
+
 # -- E3: Denoising patch ----------------------------------------------------
-
-def denoising_patch_mlp(
-    tokenizer, model_eager, source_prompt: str, target_prompt: str,
-    layer_idx: int, correct: int, wrong: int, norm_match: bool = True,
-) -> dict:
-    """Inject source MLP output into target forward pass, norm-matched."""
-    # capture source MLP output
-    remove_all_hooks(model_eager)
-    source_cache = {}
-
-    def capture_source(module, input, output, _cache=source_cache):
-        o = output if isinstance(output, torch.Tensor) else output[0]
-        _cache["out"] = o[0, -1, :].detach().clone()
-
-    handle = model_eager.model.layers[layer_idx - 1].mlp.register_forward_hook(capture_source)
-    with torch.no_grad():
-        model_eager(**make_inputs_eager(tokenizer, model_eager, source_prompt))
-    handle.remove()
-    source_mlp = source_cache["out"]
-
-    # capture target MLP norm for matching
-    if norm_match:
-        remove_all_hooks(model_eager)
-        target_cache = {}
-
-        def capture_target(module, input, output, _cache=target_cache):
-            o = output if isinstance(output, torch.Tensor) else output[0]
-            _cache["out"] = o[0, -1, :].detach().clone()
-
-        handle = model_eager.model.layers[layer_idx - 1].mlp.register_forward_hook(capture_target)
-        with torch.no_grad():
-            model_eager(**make_inputs_eager(tokenizer, model_eager, target_prompt))
-        handle.remove()
-        target_norm = target_cache["out"].norm()
-        source_mlp = source_mlp * (target_norm / (source_mlp.norm() + 1e-8))
-
-    # inject
-    remove_all_hooks(model_eager)
-
-    def inject_hook(module, input, output, _src=source_mlp):
-        if isinstance(output, torch.Tensor):
-            patched = output.clone()
-            patched[0, -1, :] = _src
-            return patched
-        else:
-            patched = output[0].clone()
-            patched[0, -1, :] = _src
-            return (patched,) + output[1:]
-
-    handle = model_eager.model.layers[layer_idx - 1].mlp.register_forward_hook(inject_hook)
-    with torch.no_grad():
-        out = model_eager(**make_inputs_eager(tokenizer, model_eager, target_prompt))
-    handle.remove()
-
-    logits = out.logits[0, -1, :]
-    return {
-        "top_digit": get_top_digit(tokenizer, logits),
-        "logit_diff": logit_difference(tokenizer, logits, correct, wrong),
-    }
-
 
 def run_denoising_patch(cfg, tokenizer, model_eager, pipe, lockin_layer: int, wrong: int) -> dict:
     print(f"\nE3: Denoising patch at L{lockin_layer}")
@@ -237,7 +156,7 @@ def run_denoising_patch(cfg, tokenizer, model_eager, pipe, lockin_layer: int, wr
         source = make_prompt_unique(n)
         target = make_prompt_repeated(n)
         pre_diff, _ = _get_pre_logit_diff(tokenizer, model_eager, target, n, wrong)
-        post = denoising_patch_mlp(tokenizer, model_eager, source, target, lockin_layer, n, wrong)
+        post = denoising_patch_mlp(tokenizer, model_eager, source, target, [lockin_layer], n, wrong)
         movement = round(pre_diff - post["logit_diff"], 4)
         print(f"  {n:>4}  {pre_diff:>10.4f}  {post['logit_diff']:>10.4f}  {movement:>10.4f}  {post['top_digit']:>11}")
         results["cross_condition"][n] = {
@@ -261,7 +180,7 @@ def run_denoising_patch(cfg, tokenizer, model_eager, pipe, lockin_layer: int, wr
         for target_n in [10, 11, 12, 15]:
             target = make_prompt_repeated(target_n)
             pre_diff, _ = _get_pre_logit_diff(tokenizer, model_eager, target, target_n, wrong)
-            post = denoising_patch_mlp(tokenizer, model_eager, source, target, lockin_layer, target_n, wrong)
+            post = denoising_patch_mlp(tokenizer, model_eager, source, target, [lockin_layer], target_n, wrong)
             movement = round(pre_diff - post["logit_diff"], 4)
             print(f"  {target_n:>8}  {pre_diff:>10.4f}  {post['logit_diff']:>10.4f}  {movement:>10.4f}  {post['top_digit']:>11}")
             results["cross_n"][target_n] = {
@@ -447,6 +366,11 @@ def main():
     tokenizer_gen, _, pipe_gen = load_generation_model(cfg.model_name)
     e3 = run_denoising_patch(cfg, tokenizer, model_eager, pipe_gen, lockin_layer, wrong)
 
+    # individual + joint site comparison (multi-writer models: llama-3b)
+    sites = cfg.ablation_sites
+    mean_ablation_sites = run_mean_ablation_sites(cfg, tokenizer, model_eager, sites, wrong)
+    patch_sites = run_patch_sites(cfg, tokenizer, model_eager, sites, wrong)
+
     # supplementary: residual patching
     residual_patch = run_residual_patching(cfg, tokenizer, model_eager, wrong)
 
@@ -460,6 +384,9 @@ def main():
         "zero_ablation": {str(k): v for k, v in e1.items()},
         "mean_ablation": {str(k): v for k, v in e2.items()},
         "denoising_patch": e3,
+        "ablation_sites": sites,
+        "mean_ablation_sites": {str(k): v for k, v in mean_ablation_sites.items()},
+        "patch_sites": {str(k): v for k, v in patch_sites.items()},
         "residual_patching": residual_patch,
         "steering_vector": steering,
     }

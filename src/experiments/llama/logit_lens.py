@@ -1,14 +1,5 @@
-"""
-All readouts report wrong-minus-correct logit difference, not argmax digit.
-D1: logit lens across layers. D2: MLP vs attention decomposition.
-D3: per-n writer input at identified writer layer.
-
-For models with critical_layers=None (Qwen), runs a full layer sweep first
-to auto-discover the writer layer.
-
-Usage:
-    uv run -m src.experiments.llama.logit_lens --model llama-1b
-"""
+# logit lens across layers, mlp/attention decomposition, and per-n writer input at the identified writer layer.
+# uv run -m src.experiments.llama.logit_lens --model llama-1b
 
 import argparse
 import json

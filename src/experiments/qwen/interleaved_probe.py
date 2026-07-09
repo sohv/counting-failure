@@ -1,14 +1,4 @@
-# For each interleaved-noise variant (space/comma baselines, newline/pipe x
-# hint/no-hint), tests whether the count probe fit on ordinary space-separated
-# prompts (n=3..13, matching mechanistic.py's own probe range) still decodes
-# n=10 from the variant's hidden state (generalization, not cross-validation),
-# and runs MLP/attention decomposition at the fixed writer layer (recomputed
-# once from mechanistic_qwen.json via the same persistence backward-scan used
-# in robustness.py, never re-detected per condition). "10" is multi-token for
-# this tokenizer, so the graded logit-difference uses "1" (its leading digit,
-# the same proxy mechanistic_qwen.json's own logit lens already reports as the
-# correct-condition top digit) against the wrong digit "8", instead of "10"
-# itself. Depends on behavioral.json and mechanistic_qwen.json.
+# tests whether the count probe and mlp/attention decomposition generalize to interleaved-noise variants for qwen.
 # uv run -m src.experiments.qwen.interleaved_probe --model qwen-1.5b
 
 import argparse

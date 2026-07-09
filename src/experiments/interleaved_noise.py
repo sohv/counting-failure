@@ -1,14 +1,5 @@
-"""
-Tests whether interleaved structural noise (newline/pipe delimiters, with and
-without a matching "-separated list" instruction hint) suppresses the
-repeated-token counting prior on phase1_baseline, compared against the
-existing space and comma baselines. Scoped to the three prior-active models
-(llama-1b, llama-3b, qwen-1.5b) - on qwen-3b/7b the prior is benign, so this
-tests nothing there.
-
-Usage:
-    uv run -m src.experiments.interleaved_noise --model llama-1b
-"""
+# tests whether interleaved structural noise (newline/pipe delimiters) suppresses the repeated-token counting prior.
+# uv run -m src.experiments.interleaved_noise --model llama-1b
 
 import argparse
 import json

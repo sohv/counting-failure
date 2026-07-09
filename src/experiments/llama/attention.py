@@ -1,11 +1,5 @@
-"""
-Word-span attention analysis: extracts per-head attention from the last token,
-computes entropy and uniformity over the word-list span for P1/P2/P3 to test
-whether repeated tokens cause attention collapse.
-
-Usage:
-    uv run -m src.experiments.llama.attention --model llama-1b
-"""
+# word-span attention analysis: entropy and uniformity over the word-list span for p1/p2/p3.
+# uv run -m src.experiments.llama.attention --model llama-1b
 
 import argparse
 import json

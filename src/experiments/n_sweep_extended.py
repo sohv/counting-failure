@@ -1,13 +1,5 @@
-"""
-Fills in the gap n-values (13, 14, 16-19) around behavioral.py's n-sweep
-(which only covers 5-12, 15, 20), purely to characterize whether a model's
-sequence-length degradation is a clean threshold. Behavioral only - no
-mechanistic work triggered by this. P1 (repeated-token) condition only.
-Depends on behavioral.json.
-
-Usage:
-    uv run -m src.experiments.n_sweep_extended --model qwen-3b
-"""
+# fills in gap n-values around behavioral.py's n-sweep and extends past n=20 to test attractor persistence.
+# uv run -m src.experiments.n_sweep_extended --model qwen-3b
 
 import argparse
 import json
@@ -19,7 +11,7 @@ from src.common.utils import extract_count, generate, load_generation_model
 
 LOGGER = logging.getLogger(__name__)
 
-EXTRA_NS = [13, 14, 16, 17, 18, 19]
+EXTRA_NS = [13, 14, 16, 17, 18, 19, 25, 30, 35, 40]
 
 
 def main():
